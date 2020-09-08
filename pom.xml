@@ -6,7 +6,7 @@
     <artifactId>farstsp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <ur>http://maven.apach.org</ur>
+    <url>http://maven.apach.org</url>
     
     <parent>
         <groupId>org.springframework.boot</groupId>
