@@ -1,8 +1,0 @@
-/Applications/work/farst/common/src/main/java/com/farst/common/service/IBasicService.java
-/Applications/work/farst/common/src/main/java/com/farst/common/entity/BasicEntity.java
-/Applications/work/farst/common/src/main/java/com/farst/common/mapper/BasicMapper.java
-/Applications/work/farst/common/src/main/java/com/farst/common/CommonApplication.java
-/Applications/work/farst/common/src/main/java/com/farst/common/web/controller/BasicController.java
-/Applications/work/farst/common/src/main/java/com/farst/common/web/response/RestResponse.java
-/Applications/work/farst/common/src/main/java/com/farst/common/mybatis/plus/generator/CodeGenerator.java
-/Applications/work/farst/common/src/main/java/com/farst/common/service/impl/BasicServiceImpl.java
