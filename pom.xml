@@ -19,7 +19,7 @@
 	<modules>
 		<module>domain</module>
         <module>common</module>
-        <module>dao</module>
+        <module>dal</module>
         <module>service</module>
         <module>web</module> 
     </modules>
