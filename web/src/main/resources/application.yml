@@ -8,3 +8,14 @@ spring:
     password: rootroot
     url: jdbc:mysql://47.106.249.248:3306/farst-test?useSSL=false&useUnicode=true&characterEncoding=utf8
     username: root
+    
+  redis:
+    host: 39.108.165.241
+    port: 6379
+    timeout: 2000
+    pool:
+      max-active: 8
+      min-idle: 0
+      max-idle: 8
+      max-wait: -1
+    password: uupredisserver123!@#

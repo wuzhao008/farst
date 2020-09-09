@@ -2,17 +2,22 @@ package com.farst.customer.controller;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.farst.customer.service.ICustomerInfoService;
+import com.farst.customer.service.ICustomerInfoService; 
 import com.farst.customer.entity.CustomerInfo;
 import com.farst.common.web.response.RestResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.springframework.web.bind.annotation.RestController;
+import com.farst.common.cache.redis.RedisUtils;
+import com.farst.common.utils.RandomUtils;
 import com.farst.common.web.controller.BasicController;
  
 /**
@@ -32,6 +37,32 @@ public class CustomerInfoController extends BasicController {
     @Autowired
     private ICustomerInfoService customerInfoService;
  	
+    @Resource
+    private RedisUtils redisUtils;
+    
+    private final String KEY_PREFIX_FARST_SMS_VERIFY_CODE = "FARST_SMS_VERIFY_CODE_";
+    
+    /**
+	 * 登陆接口
+	 */ 
+	@PostMapping("/getVerifyCode")
+	@ApiOperation(value = "获取验证码")
+	public RestResponse<String> getVerifyCode(HttpServletRequest request,@RequestParam(value = "phoneNumber", required = true) String phoneNumber) {
+		RestResponse<String> response = new RestResponse<>();
+		//临时生成5位验证码,后续对接发送短信接口
+		String verifyCode = null;		
+		try {  
+			//verifyCode = RandomUtils.nextInt(1000, 9999).toString();
+			verifyCode = "1234";
+			redisUtils.set(KEY_PREFIX_FARST_SMS_VERIFY_CODE+phoneNumber, verifyCode, 10*60);
+		    response.setSuccess(verifyCode);
+		}catch (Exception e) {
+			response.setErrorMsg("获取验证码失败");
+		}
+		return response;
+		
+	}
+	
     /**
      * 查询分页数据
      */
