@@ -1,0 +1,10 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: farstsp
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: rootroot
+    url: jdbc:mysql://47.106.249.248:3306/farst-test?useSSL=false&useUnicode=true&characterEncoding=utf8
+    username: root
