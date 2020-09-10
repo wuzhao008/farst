@@ -3,7 +3,8 @@ package com.farst.customer.service.impl;
 import com.farst.customer.entity.CustomerInfo;
 import com.farst.customer.mapper.CustomerInfoMapper;
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.common.service.impl.BasicServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.farst.common.service.impl.BasicServiceImpl; 
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,5 +17,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CustomerInfoServiceImpl extends BasicServiceImpl<CustomerInfoMapper, CustomerInfo> implements ICustomerInfoService {
-
+	 
+	
+	@Override
+	public CustomerInfo getCustomerInfoByPhoneNumber(String phoneNumber) {
+		QueryWrapper<CustomerInfo> queryWrapper = new QueryWrapper<CustomerInfo>();
+		queryWrapper.eq("status", 0).eq("phone_number", phoneNumber);
+		return this.getOne(queryWrapper); 
+	} 
+	
 }

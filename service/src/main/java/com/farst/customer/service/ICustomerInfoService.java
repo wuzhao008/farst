@@ -13,4 +13,12 @@ import com.farst.common.service.IBasicService;
  */
 public interface ICustomerInfoService extends IBasicService<CustomerInfo> {
 
+	/**
+	 * 根据手机号码获取客户信息
+	 * 
+	 * @param phoneNumber 手机号码
+	 * @return 客户信息
+	 */
+	public CustomerInfo getCustomerInfoByPhoneNumber(String phoneNumber);
+
 }

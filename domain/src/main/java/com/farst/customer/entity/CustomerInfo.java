@@ -2,6 +2,8 @@ package com.farst.customer.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 import com.farst.common.entity.BasicEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -51,16 +53,16 @@ public class CustomerInfo extends BasicEntity {
     private Integer status;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createDate;
+    private Date createDate;
 
     @ApiModelProperty(value = "最近修改时间")
-    private LocalDateTime lastEditTime;
+    private Date lastEditTime;
 
     @ApiModelProperty(value = "最近登陆IP")
     private String lastLoginIp;
 
     @ApiModelProperty(value = "最近登陆时间")
-    private LocalDateTime lastLoginTime;
+    private Date lastLoginTime;
 
 
 }

@@ -2,22 +2,36 @@ package com.farst.customer.controller;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.farst.customer.service.ICustomerInfoService; 
+import com.farst.customer.service.ICustomerInfoService;
+import com.farst.customer.service.ICustomerLabelService;
+import com.farst.customer.vo.PhoneLoginVo;
+import com.farst.customer.vo.TokenCustVo;
+import com.farst.customer.vo.TokenInfoVo; 
 import com.farst.customer.entity.CustomerInfo;
 import com.farst.common.web.response.RestResponse;
+
+import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation; 
+
+import java.util.Date;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
+ 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.farst.common.cache.redis.RedisUtils;
+import com.farst.common.exception.ServiceException; 
+import com.farst.common.utils.JwtUtils;
 import com.farst.common.utils.RandomUtils;
+import com.farst.common.utils.StringUtils; 
 import com.farst.common.web.controller.BasicController;
  
 /**
@@ -34,8 +48,12 @@ import com.farst.common.web.controller.BasicController;
 @RequestMapping("/customer/customerInfo")
 public class CustomerInfoController extends BasicController {
     private Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
     private ICustomerInfoService customerInfoService;
+    
+    @Autowired
+    private ICustomerLabelService customerLabelService;
  	
     @Resource
     private RedisUtils redisUtils;
@@ -60,35 +78,84 @@ public class CustomerInfoController extends BasicController {
 			response.setErrorMsg("获取验证码失败");
 		}
 		return response;
-		
 	}
-	
-    /**
-     * 查询分页数据
-     */
-    @ApiOperation(value = "查询分页数据")
-    @GetMapping(value = "/list")
-    public RestResponse<IPage<CustomerInfo>> findListByPage(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,@RequestParam(name = "pageSize", defaultValue = "20") int pageSize){
-        RestResponse<IPage<CustomerInfo>> response = new RestResponse<>();
-    	IPage<CustomerInfo> page = new Page<CustomerInfo>(pageNum, pageSize);
-    	QueryWrapper<CustomerInfo> wrapper = new QueryWrapper<CustomerInfo>();
-    	CustomerInfo customerInfo = new CustomerInfo();
-    	wrapper.setEntity(customerInfo);
-    	try {
-	    	page = this.customerInfoService.page(page, wrapper);
-	    	response.setData(page);
-    	}catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            response.setErrorMsg(e.getMessage());
-        }
-    	return response;
-    }
- 	
+	 
+	@PostMapping("/phoneLogin")
+	@ApiOperation(value = "手机登陆")
+	public RestResponse<PhoneLoginVo> phoneAuthLogin(HttpServletRequest request,
+			@RequestParam(value = "phoneNumber", required = true) String phoneNumber,@RequestParam(value = "verifyCode", required = true) String verifyCode) {
+		RestResponse<PhoneLoginVo> response = new RestResponse<>();
+		TokenInfoVo tokenInfoVo = new TokenInfoVo();
+		boolean hasNickName = false;
+		boolean hasSex = false;
+		boolean hasLabel = false;
+		try {
+			String _verifyCode = (String) redisUtils.get(KEY_PREFIX_FARST_SMS_VERIFY_CODE+phoneNumber); 
+			
+			if(StringUtils.isNotEmpty(_verifyCode) && _verifyCode.equals(verifyCode)) {
+				String ipAddress = StringUtils.getIpAddr(request);
+				CustomerInfo customerInfo = this.customerInfoService.getCustomerInfoByPhoneNumber(phoneNumber);
+				if(customerInfo != null) {
+					customerInfo.setLastLoginIp(ipAddress);
+					customerInfo.setLastLoginTime(new Date());
+					this.customerInfoService.saveOrUpdate(customerInfo); 
+					
+					hasNickName = (customerInfo.getNickName() != null) ? true :false;
+					hasSex = (customerInfo.getSex() != null) ? true : false;
+					hasLabel = this.customerLabelService.hasCustomerLabel(customerInfo.getId());
+					
+				}else {
+					customerInfo = new CustomerInfo(); 
+					customerInfo.setPhoneNumber(phoneNumber);
+					customerInfo.setLastLoginIp(ipAddress);
+					customerInfo.setLastLoginTime(new Date());
+					customerInfo.setCreateDate(new Date());
+					customerInfo.setStatus(0);
+					customerInfo.setLevel(1);
+					customerInfo.setSlogan("为自己打卡，为自己坚持!");
+					customerInfoService.save(customerInfo);
+				}
+
+				Integer custId = customerInfo.getId();
+				
+				long expire =  60 * 60 * 24 * 1L;
+				TokenCustVo tokenCustVo = new TokenCustVo();
+				tokenCustVo.setCustId(custId); 
+				tokenCustVo.setPhoneNumber(phoneNumber);
+				
+				//根据tokenCustVo获取tokenid
+				String subject = JSONObject.toJSONString(tokenCustVo);
+				String tokenid = JwtUtils.createJWT(custId.toString(), subject, expire);
+				
+				tokenInfoVo.setTokenId(tokenid);
+				tokenInfoVo.setCustomerId(custId);
+				tokenInfoVo.setExpire(expire); 
+				
+				//返回对象
+				PhoneLoginVo phoneLoginVo = new PhoneLoginVo();
+				phoneLoginVo.setHasLabel(hasLabel);
+				phoneLoginVo.setHasNickName(hasNickName);
+				phoneLoginVo.setHasSex(hasSex);
+				phoneLoginVo.setTokenInfoVo(tokenInfoVo);
+				response.setSuccess(phoneLoginVo);
+					
+			}else {
+				response.setErrorMsg("验证码错误");
+			}
+			
+			return response; 
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			response.setErrorMsg(e.getMessage());
+			return response;
+		}
+	}
+  
     /**
      * 根据id查询
      */
-    @ApiOperation(value = "根据id查询数据")
+    @ApiOperation(value = "根据客户id查询客户信息")
     @GetMapping(value = "/getById")
     public RestResponse<CustomerInfo> getById(@RequestParam("id") Integer id){
       	 RestResponse<CustomerInfo> response = new RestResponse<>();
@@ -102,24 +169,42 @@ public class CustomerInfoController extends BasicController {
          }
          return response;
     }
- 
-    /**
-     * 新增
-     */
-    @ApiOperation(value = "新增数据")
-    @PostMapping(value = "/add")
-    public RestResponse<CustomerInfo> add(@RequestBody CustomerInfo customerInfo){
-    	 RestResponse<CustomerInfo> response = new RestResponse<>();
-         try {
-            customerInfoService.save(customerInfo);
-            response.setSuccess(customerInfo);
-         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            response.setErrorMsg(e.getMessage());
-         }
-         return response;
+    
+    @ApiOperation(value = "设置昵称")
+    @PostMapping(value = "/editNickName")
+    public RestResponse<String> editNickName(@RequestHeader("tokenid") String tokenid,@RequestParam("nickName") String nickName){
+    	RestResponse<String> response = new RestResponse<>();
+    	try {
+    		Integer custId = this.getTokenCustVo(tokenid).getCustId();
+    		CustomerInfo customerInfo = this.customerInfoService.getById(custId);
+    		customerInfo.setNickName(nickName);
+    		customerInfo.setLastEditTime(new Date());
+    		this.customerInfoService.saveOrUpdate(customerInfo);
+    		response.setSuccess(null,"设置成功");
+    	}catch(Exception e) {
+    		response.setErrorMsg(e.getMessage());
+    	}
+    	return response;
     }
+    
+
+    @ApiOperation(value = "设置性别")
+    @PostMapping(value = "/editSex")
+    public RestResponse<String> editSex(@RequestHeader("tokenid") String tokenid,@RequestParam("sex") Integer sex){
+    	RestResponse<String> response = new RestResponse<>();
+    	try {
+    		Integer custId = this.getTokenCustVo(tokenid).getCustId();
+    		CustomerInfo customerInfo = this.customerInfoService.getById(custId);
+    		customerInfo.setSex(sex);
+    		customerInfo.setLastEditTime(new Date());
+    		this.customerInfoService.saveOrUpdate(customerInfo);
+    		response.setSuccess(null, "设置成功");
+    	}catch(Exception e) {
+    		response.setErrorMsg(e.getMessage());
+    	}
+    	return response;
+    }
+    
  
     /**
      * 修改
@@ -138,5 +223,26 @@ public class CustomerInfoController extends BasicController {
          }
          return response;
      }
+    
+
+    /**
+     * 根据jwt字符串获取到tokenCustVo对象
+     * @param jwt
+     * @return
+     * @throws ServiceException
+     */
+	private TokenCustVo getTokenCustVo(String jwt) throws ServiceException{
+		TokenCustVo tokenCustVo = new TokenCustVo();
+		try {
+			Claims claims = JwtUtils.parseJWT(jwt);
+			String subject = claims.getSubject();			
+			JSON json = (JSON) JSONObject.parse(subject);                      
+			tokenCustVo = JSONObject.toJavaObject(json, TokenCustVo.class);
+		} catch (Exception e) {
+			System.out.println("tokonId="+jwt +" \r\n exception:"+e.getMessage());
+			throw new ServiceException("获取用户信息失败",e);
+		}
+		return tokenCustVo;
+	}
  
 }
