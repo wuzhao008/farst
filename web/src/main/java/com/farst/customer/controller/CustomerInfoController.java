@@ -23,14 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.alibaba.fastjson.JSONObject; 
 import com.farst.common.cache.redis.RedisUtils;
 import com.farst.common.exception.ServiceException; 
-import com.farst.common.utils.JwtUtils;
-import com.farst.common.utils.RandomUtils;
+import com.farst.common.utils.JwtUtils; 
 import com.farst.common.utils.StringUtils; 
 import com.farst.common.web.controller.BasicController;
  
@@ -175,7 +171,7 @@ public class CustomerInfoController extends BasicController {
     public RestResponse<String> editNickName(@RequestHeader("tokenid") String tokenid,@RequestParam("nickName") String nickName){
     	RestResponse<String> response = new RestResponse<>();
     	try {
-    		Integer custId = this.getTokenCustVo(tokenid).getCustId();
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
     		CustomerInfo customerInfo = this.customerInfoService.getById(custId);
     		customerInfo.setNickName(nickName);
     		customerInfo.setLastEditTime(new Date());
@@ -193,7 +189,7 @@ public class CustomerInfoController extends BasicController {
     public RestResponse<String> editSex(@RequestHeader("tokenid") String tokenid,@RequestParam("sex") Integer sex){
     	RestResponse<String> response = new RestResponse<>();
     	try {
-    		Integer custId = this.getTokenCustVo(tokenid).getCustId();
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
     		CustomerInfo customerInfo = this.customerInfoService.getById(custId);
     		customerInfo.setSex(sex);
     		customerInfo.setLastEditTime(new Date());
@@ -224,25 +220,6 @@ public class CustomerInfoController extends BasicController {
          return response;
      }
     
-
-    /**
-     * 根据jwt字符串获取到tokenCustVo对象
-     * @param jwt
-     * @return
-     * @throws ServiceException
-     */
-	private TokenCustVo getTokenCustVo(String jwt) throws ServiceException{
-		TokenCustVo tokenCustVo = new TokenCustVo();
-		try {
-			Claims claims = JwtUtils.parseJWT(jwt);
-			String subject = claims.getSubject();			
-			JSON json = (JSON) JSONObject.parse(subject);                      
-			tokenCustVo = JSONObject.toJavaObject(json, TokenCustVo.class);
-		} catch (Exception e) {
-			System.out.println("tokonId="+jwt +" \r\n exception:"+e.getMessage());
-			throw new ServiceException("获取用户信息失败",e);
-		}
-		return tokenCustVo;
-	}
+ 
  
 }

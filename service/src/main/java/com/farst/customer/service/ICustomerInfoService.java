@@ -1,6 +1,8 @@
 package com.farst.customer.service;
 
 import com.farst.customer.entity.CustomerInfo;
+import com.farst.customer.vo.TokenCustVo;
+import com.farst.common.exception.ServiceException;
 import com.farst.common.service.IBasicService;
 
 /**
@@ -13,6 +15,15 @@ import com.farst.common.service.IBasicService;
  */
 public interface ICustomerInfoService extends IBasicService<CustomerInfo> {
 
+	/**
+	 * 根据tokenid解密用户信息
+	 * 
+	 * @param jwt
+	 * @return
+	 * @throws ServiceException
+	 */
+	public TokenCustVo getTokenCustVo(String jwt) throws ServiceException;
+	
 	/**
 	 * 根据手机号码获取客户信息
 	 * 
