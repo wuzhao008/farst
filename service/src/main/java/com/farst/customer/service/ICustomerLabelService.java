@@ -48,4 +48,23 @@ public interface ICustomerLabelService extends IBasicService<CustomerLabel> {
 	 * @return
 	 */
 	public List<SelectClockinLabelVo> getListSelectClockinLabelVo(Integer customerInfoId);
+	
+	
+	
+	/**
+	 * 更新用户新标签
+	 * 
+	 * @param customerInfoId
+	 * @param listLabelId
+	 */
+	public void updCustomerLabel(Integer customerInfoId,List<Integer> listLabelId);
+	
+	/**
+	 * 获取用户标签-不论状态
+	 * 
+	 * @param customerInfoId
+	 * @param labelId
+	 * @return
+	 */
+	public CustomerLabel getCustomerLabelRecord(Integer customerInfoId,Integer labelId);
 }

@@ -11,6 +11,7 @@ import com.farst.clockin.vo.SelectClockinLabelVo;
 import com.farst.common.service.impl.BasicServiceImpl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -85,6 +86,45 @@ public class CustomerLabelServiceImpl extends BasicServiceImpl<CustomerLabelMapp
 			});
 		}
 		return listClockinLabelId;
+	}
+
+	@Override
+	public CustomerLabel getCustomerLabelRecord(Integer customerInfoId, Integer labelId) {
+		QueryWrapper<CustomerLabel> queryWrapper = new QueryWrapper<CustomerLabel>();
+		queryWrapper.eq("customer_info_id", customerInfoId).eq("clockin_label_id", labelId);
+		return this.getOne(queryWrapper);
+	}
+
+	@Override
+	public void updCustomerLabel(Integer customerInfoId, List<Integer> listLabelId) {
+		//先将原选择标签置为删除标记
+		List<CustomerLabel> listCustomerLabel = this.getListCustomerLabel(customerInfoId);
+		if(CollectionUtils.isNotEmpty(listCustomerLabel)) {
+			for(CustomerLabel customerLabel : listCustomerLabel) {
+				customerLabel.setStatus(1);
+				customerLabel.setLastEditTime(new Date());
+				this.saveOrUpdate(customerLabel);
+			}
+		}
+		//循环新标签ID，不存在数据库则新增，存在则修改删除标记为正常
+		if(CollectionUtils.isNotEmpty(listLabelId)) {
+			for(Integer labelId : listLabelId) {
+				CustomerLabel customerLabel = this.getCustomerLabelRecord(customerInfoId, labelId);
+				if(customerLabel != null) {
+					customerLabel.setStatus(0);
+					customerLabel.setLastEditTime(new Date());
+				}else {
+					customerLabel = new CustomerLabel();
+					customerLabel.setCustomerInfoId(customerInfoId);
+					customerLabel.setClockinLabelId(labelId);
+					customerLabel.setStatus(0);
+					customerLabel.setCreateDate(new Date());
+				}
+				this.saveOrUpdate(customerLabel);
+			}
+		}
+		
+		
 	}
 
 }

@@ -12,12 +12,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.IPage; 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.farst.clockin.vo.SelectClockinLabelVo;
 import com.farst.common.web.controller.BasicController;
@@ -46,9 +49,9 @@ public class CustomerLabelController extends BasicController {
     /**
      * 根据id查询所有标签信息
      */
-    @ApiOperation(value = "根据客户id查询所有标签信息")
+    @ApiOperation(value = "得到所有标签信息-含用户是否已选择标记")
     @GetMapping(value = "/getListLabel")
-    public RestResponse<List<SelectClockinLabelVo>> getById(@RequestHeader("tokenid") String tokenid){
+    public RestResponse<List<SelectClockinLabelVo>> getListLabel(@RequestHeader("tokenid") String tokenid){
       	 RestResponse<List<SelectClockinLabelVo>> response = new RestResponse<>();
       	List<SelectClockinLabelVo> listSelectClockinLabelVo = new ArrayList<SelectClockinLabelVo>();
          try {
@@ -61,6 +64,29 @@ public class CustomerLabelController extends BasicController {
             response.setErrorMsg(e.getMessage());
          }
          return response;
+    }
+    
+
+    @ApiOperation(value = "选择标签并保存")
+    @PostMapping(value = "/selectLabel")
+    public RestResponse<String> editSex(@RequestHeader("tokenid") String tokenid,@RequestParam("labelIds") String labelIds){
+    	RestResponse<String> response = new RestResponse<>();
+    	if(StringUtils.isEmpty(labelIds)) {
+    		response.setErrorMsg("至少需要选择一个标签");
+    	}
+    	try {
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+    		List<Integer> listLabelId = new ArrayList<Integer>();
+    		String[] arrLabelId = labelIds.split(",");
+    		for(String labelId : arrLabelId) {
+    			listLabelId.add(Integer.valueOf(labelId));
+    		}
+    		this.customerLabelService.updCustomerLabel(custId, listLabelId);
+    		response.setSuccess(null, "选择标签并保存成功");
+    	}catch(Exception e) {
+    		response.setErrorMsg(e.getMessage());
+    	}
+    	return response;
     }
     
  
