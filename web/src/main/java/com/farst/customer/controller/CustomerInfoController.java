@@ -56,6 +56,9 @@ public class CustomerInfoController extends BasicController {
     
     private final String KEY_PREFIX_FARST_SMS_VERIFY_CODE = "FARST_SMS_VERIFY_CODE_";
     
+    //tokenid缓存过期时间
+    private final long TOKENID_EXPIRE = 1000 * 60 * 60 * 24 * 1L;
+    
     /**
 	 * 登陆接口
 	 */ 
@@ -113,19 +116,18 @@ public class CustomerInfoController extends BasicController {
 				}
 
 				Integer custId = customerInfo.getId();
-				
-				long expire =  60 * 60 * 24 * 1L;
+				 
 				TokenCustVo tokenCustVo = new TokenCustVo();
 				tokenCustVo.setCustId(custId); 
 				tokenCustVo.setPhoneNumber(phoneNumber);
 				
 				//根据tokenCustVo获取tokenid
 				String subject = JSONObject.toJSONString(tokenCustVo);
-				String tokenid = JwtUtils.createJWT(custId.toString(), subject, expire);
+				String tokenid = JwtUtils.createJWT(custId.toString(), subject, TOKENID_EXPIRE);
 				
 				tokenInfoVo.setTokenId(tokenid);
 				tokenInfoVo.setCustomerId(custId);
-				tokenInfoVo.setExpire(expire); 
+				tokenInfoVo.setExpire(TOKENID_EXPIRE); 
 				
 				//返回对象
 				PhoneLoginVo phoneLoginVo = new PhoneLoginVo();
@@ -138,6 +140,52 @@ public class CustomerInfoController extends BasicController {
 			}else {
 				response.setErrorMsg("验证码错误");
 			}
+			
+			return response; 
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			response.setErrorMsg(e.getMessage());
+			return response;
+		}
+	}
+	
+	@PostMapping("/validateToken")
+	@ApiOperation(value = "token验证")
+	public RestResponse<PhoneLoginVo> validateToken(HttpServletRequest request,@RequestHeader("tokenid") String tokenid) {
+		RestResponse<PhoneLoginVo> response = new RestResponse<>();
+		TokenInfoVo tokenInfoVo = new TokenInfoVo();
+		boolean hasNickName = false;
+		boolean hasSex = false;
+		boolean hasLabel = false;
+		try {
+
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+    		CustomerInfo customerInfo = this.customerInfoService.getById(custId);
+					
+			hasNickName = (customerInfo.getNickName() != null) ? true :false;
+			hasSex = (customerInfo.getSex() != null) ? true : false;
+			hasLabel = this.customerLabelService.hasCustomerLabel(customerInfo.getId());
+			 
+			TokenCustVo tokenCustVo = new TokenCustVo();
+			tokenCustVo.setCustId(custId); 
+			tokenCustVo.setPhoneNumber(customerInfo.getPhoneNumber());
+			
+			//根据tokenCustVo获取tokenid
+			String subject = JSONObject.toJSONString(tokenCustVo);
+			tokenid = JwtUtils.createJWT(custId.toString(), subject, TOKENID_EXPIRE);
+			
+			tokenInfoVo.setTokenId(tokenid);
+			tokenInfoVo.setCustomerId(custId);
+			tokenInfoVo.setExpire(TOKENID_EXPIRE);
+			
+			//返回对象
+			PhoneLoginVo phoneLoginVo = new PhoneLoginVo();
+			phoneLoginVo.setHasLabel(hasLabel);
+			phoneLoginVo.setHasNickName(hasNickName);
+			phoneLoginVo.setHasSex(hasSex);
+			phoneLoginVo.setTokenInfoVo(tokenInfoVo);
+			response.setSuccess(phoneLoginVo); 
 			
 			return response; 
 		} catch (Exception e) {
