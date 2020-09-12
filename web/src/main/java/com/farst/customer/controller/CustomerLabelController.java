@@ -73,11 +73,11 @@ public class CustomerLabelController extends BasicController {
     }
     
     /**
-     * 查询我的标签习惯信息
+     * 查询我的标签习惯设置信息列表
      */
-    @ApiOperation(value = "我的（当前用户）标签习惯信息")
-    @GetMapping(value = "/getMyListLabel")
-    public RestResponse<List<ClockinLabelSettingVo>> getMyListLabel(@RequestHeader("tokenid") String tokenid){
+    @ApiOperation(value = "我的标签习惯设置列表信息")
+    @GetMapping(value = "/getMyListLabelSetting")
+    public RestResponse<List<ClockinLabelSettingVo>> getMyListLabelSetting(@RequestHeader("tokenid") String tokenid){
       	 RestResponse<List<ClockinLabelSettingVo>> response = new RestResponse<>();
       	List<ClockinLabelSettingVo> listMyClsVo = new ArrayList<ClockinLabelSettingVo>();
          try {
@@ -87,7 +87,7 @@ public class CustomerLabelController extends BasicController {
      			 for(CustomerLabel cl : listCl) {
      				 
       				ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
-     				ClockinSetting setting = this.clockinSettingService.getClockingSettingBy(cl.getCustomerInfoId(), cl.getClockinLabelId());
+     				ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getCustomerInfoId(), cl.getClockinLabelId());
      				
       				ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
      				clsVo.setId(cl.getId());
@@ -105,6 +105,42 @@ public class CustomerLabelController extends BasicController {
          }
          return response;
     }
+    
+    /**
+     * 根据ID查询标签习惯设置信息
+     */
+    @ApiOperation(value = "根据ID查询标签习惯设置信息")
+    @GetMapping(value = "/getLabelSettingById")
+    public RestResponse<ClockinLabelSettingVo> getLabelSettingById(@RequestHeader("tokenid") String tokenid,@RequestParam("id") Integer id){
+      	 RestResponse<ClockinLabelSettingVo> response = new RestResponse<>(); 
+         try { 
+             try {
+         		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+         		 ClockinSetting setting = this.clockinSettingService.getById(id);
+         		 if(setting.getCustomerInfoId() != custId) {
+         			 response.setErrorMsg("非法请求");
+         		 }
+         		 ClockinLabel label = this.clockinLabelService.getById(setting.getClockinLabelId());
+         		 ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
+         		 clsVo.setId(id);
+         		 clsVo.setClockinLabel(label);
+         		 clsVo.setClockinSetting(setting);
+            	 response.setSuccess(clsVo);
+             } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e.getMessage());
+                response.setErrorMsg(e.getMessage());
+             }
+             return response;
+         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+         }
+         return response;
+    }
+    
+    
 
     @ApiOperation(value = "选择我的标签并保存")
     @PostMapping(value = "/selectMyLabel")

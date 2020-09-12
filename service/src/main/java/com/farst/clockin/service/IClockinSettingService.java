@@ -14,11 +14,11 @@ import com.farst.common.service.IBasicService;
 public interface IClockinSettingService extends IBasicService<ClockinSetting> {
 
 	/**
-	 * 根据用户id和标签id得到习惯设置
+	 * 根据用户id和标签id得到最新的习惯设置
 	 * 
 	 * @param customerInfoId
 	 * @param labelId
 	 * @return
 	 */
-	public ClockinSetting getClockingSettingBy(Integer customerInfoId,Integer labelId);
+	public ClockinSetting getLatestClockingSettingBy(Integer customerInfoId,Integer labelId);
 }
