@@ -8,8 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data; 
 
 @Data
-@ApiModel(value = "选标签Vo")
-public class SelectClockinLabelVo implements Serializable{
+@ApiModel(value = "所有待选择标签Vo")
+public class AllClockinLabelVo implements Serializable{
 	 
 	private static final long serialVersionUID = 1L;
 	

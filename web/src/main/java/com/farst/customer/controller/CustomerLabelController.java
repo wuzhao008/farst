@@ -4,25 +4,25 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.customer.service.ICustomerLabelService;
-import com.farst.customer.entity.CustomerInfo;
+import com.farst.customer.service.ICustomerLabelService; 
 import com.farst.customer.entity.CustomerLabel;
 import com.farst.common.web.response.RestResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.ArrayList;  
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage; 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.farst.clockin.vo.SelectClockinLabelVo;
+import org.slf4j.LoggerFactory; 
+import com.farst.clockin.entity.ClockinLabel;
+import com.farst.clockin.entity.ClockinSetting;
+import com.farst.clockin.service.IClockinLabelService;
+import com.farst.clockin.service.IClockinSettingService;
+import com.farst.clockin.vo.AllClockinLabelVo;
+import com.farst.clockin.vo.ClockinLabelSettingVo;
 import com.farst.common.web.controller.BasicController;
  
 /**
@@ -46,18 +46,24 @@ public class CustomerLabelController extends BasicController {
     @Autowired
     private ICustomerInfoService customerInfoService;
  	
+    @Autowired
+    private IClockinLabelService clockinLabelService;
+    
+    @Autowired
+    private IClockinSettingService clockinSettingService;
+    
     /**
-     * 根据id查询所有标签信息
+     * 根据用户查询所有标签信息
      */
-    @ApiOperation(value = "得到所有标签信息-含用户是否已选择标记")
-    @GetMapping(value = "/getListLabel")
-    public RestResponse<List<SelectClockinLabelVo>> getListLabel(@RequestHeader("tokenid") String tokenid){
-      	 RestResponse<List<SelectClockinLabelVo>> response = new RestResponse<>();
-      	List<SelectClockinLabelVo> listSelectClockinLabelVo = new ArrayList<SelectClockinLabelVo>();
+    @ApiOperation(value = "所有标签习惯信息-含当前用户是否已选择标记")
+    @GetMapping(value = "/getAllListLabel")
+    public RestResponse<List<AllClockinLabelVo>> getListLabel(@RequestHeader("tokenid") String tokenid){
+      	 RestResponse<List<AllClockinLabelVo>> response = new RestResponse<>();
+      	List<AllClockinLabelVo> listSCLVo = new ArrayList<AllClockinLabelVo>();
          try {
      		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-        	 listSelectClockinLabelVo = this.customerLabelService.getListSelectClockinLabelVo(custId);
-        	 response.setSuccess(listSelectClockinLabelVo);
+     		listSCLVo = this.customerLabelService.getListSelectClockinLabelVo(custId);
+        	 response.setSuccess(listSCLVo);
          } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -66,9 +72,42 @@ public class CustomerLabelController extends BasicController {
          return response;
     }
     
+    /**
+     * 查询我的标签习惯信息
+     */
+    @ApiOperation(value = "我的（当前用户）标签习惯信息")
+    @GetMapping(value = "/getMyListLabel")
+    public RestResponse<List<ClockinLabelSettingVo>> getMyListLabel(@RequestHeader("tokenid") String tokenid){
+      	 RestResponse<List<ClockinLabelSettingVo>> response = new RestResponse<>();
+      	List<ClockinLabelSettingVo> listMyClsVo = new ArrayList<ClockinLabelSettingVo>();
+         try {
+     		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		 List<CustomerLabel> listCl = this.customerLabelService.getListCustomerLabel(custId);
+     		 if(CollectionUtils.isNotEmpty(listCl)) {
+     			 for(CustomerLabel cl : listCl) {
+     				 
+      				ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
+     				ClockinSetting setting = this.clockinSettingService.getClockingSettingBy(cl.getCustomerInfoId(), cl.getClockinLabelId());
+     				
+      				ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
+     				clsVo.setId(cl.getId());
+     				clsVo.setClockinLabel(label);
+     				clsVo.setClockinSetting(setting);
+     				
+     				listMyClsVo.add(clsVo);
+     			 }
+     		 }
+        	 response.setSuccess(listMyClsVo);
+         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+         }
+         return response;
+    }
 
-    @ApiOperation(value = "选择标签并保存")
-    @PostMapping(value = "/selectLabel")
+    @ApiOperation(value = "选择我的标签并保存")
+    @PostMapping(value = "/selectMyLabel")
     public RestResponse<String> editSex(@RequestHeader("tokenid") String tokenid,@RequestParam("labelIds") String labelIds){
     	RestResponse<String> response = new RestResponse<>();
     	if(StringUtils.isEmpty(labelIds)) {

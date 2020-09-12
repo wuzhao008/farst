@@ -1,6 +1,9 @@
 package com.farst.sys.service;
 
 import com.farst.sys.entity.SysHelpCenter;
+
+import java.util.List;
+
 import com.farst.common.service.IBasicService;
 
 /**
@@ -13,4 +16,5 @@ import com.farst.common.service.IBasicService;
  */
 public interface ISysHelpCenterService extends IBasicService<SysHelpCenter> {
 
+	public List<SysHelpCenter> getListHelp();
 }

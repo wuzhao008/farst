@@ -4,7 +4,7 @@ import com.farst.customer.entity.CustomerLabel;
 
 import java.util.List;
 
-import com.farst.clockin.vo.SelectClockinLabelVo;
+import com.farst.clockin.vo.AllClockinLabelVo;
 import com.farst.common.service.IBasicService;
 
 /**
@@ -47,7 +47,7 @@ public interface ICustomerLabelService extends IBasicService<CustomerLabel> {
 	 * @param customerInfoId
 	 * @return
 	 */
-	public List<SelectClockinLabelVo> getListSelectClockinLabelVo(Integer customerInfoId);
+	public List<AllClockinLabelVo> getListSelectClockinLabelVo(Integer customerInfoId);
 	
 	
 	

@@ -1,12 +1,14 @@
 package com.farst.customer.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.farst.customer.service.ICustomerInfoService;
 import com.farst.customer.service.ICustomerLabelService;
 import com.farst.customer.vo.PhoneLoginVo;
 import com.farst.customer.vo.TokenCustVo;
-import com.farst.customer.vo.TokenInfoVo; 
+import com.farst.customer.vo.TokenInfoVo;
+import com.farst.customer.dto.CustomerInfoDto;
 import com.farst.customer.entity.CustomerInfo;
 import com.farst.common.web.response.RestResponse;
 
@@ -255,9 +257,13 @@ public class CustomerInfoController extends BasicController {
      */
     @ApiOperation(value = "更新数据")
     @PostMapping(value = "/update")
-    public RestResponse<CustomerInfo> update(@RequestBody CustomerInfo customerInfo){
+    public RestResponse<CustomerInfo> update(@RequestHeader("tokenid") String tokenid,@RequestBody CustomerInfoDto customerInfoDto){
          RestResponse<CustomerInfo> response = new RestResponse<>();
          try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+        	CustomerInfo customerInfo = this.customerInfoService.getById(custId);
+        	BeanUtils.copyProperties(customerInfoDto, customerInfo);
+        	customerInfo.setLastEditTime(new Date());
             customerInfoService.saveOrUpdate(customerInfo);
             response.setSuccess(customerInfo);
          } catch (Exception e) {

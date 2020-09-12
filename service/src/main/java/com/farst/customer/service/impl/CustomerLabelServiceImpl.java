@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.farst.clockin.entity.ClockinLabel;
 import com.farst.clockin.service.IClockinLabelService;
 import com.farst.clockin.vo.ChildClockinLabelVo;
-import com.farst.clockin.vo.SelectClockinLabelVo;
+import com.farst.clockin.vo.AllClockinLabelVo;
 import com.farst.common.service.impl.BasicServiceImpl;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class CustomerLabelServiceImpl extends BasicServiceImpl<CustomerLabelMapp
 	@Override
 	public List<CustomerLabel> getListCustomerLabel(Integer customerInfoId) {
 		QueryWrapper<CustomerLabel> queryWrapper = new QueryWrapper<CustomerLabel>();
-		queryWrapper.eq("status", 0).eq("customer_info_id", customerInfoId);
+		queryWrapper.eq("status", 0).eq("customer_info_id", customerInfoId).orderByAsc("id");
 		return this.list(queryWrapper);
 	}
 
@@ -47,15 +47,15 @@ public class CustomerLabelServiceImpl extends BasicServiceImpl<CustomerLabelMapp
 	}
 
 	@Override
-	public List<SelectClockinLabelVo> getListSelectClockinLabelVo(Integer customerInfoId) {
+	public List<AllClockinLabelVo> getListSelectClockinLabelVo(Integer customerInfoId) {
 		
-		List<SelectClockinLabelVo> listSelectClockinLabelVo = new ArrayList<SelectClockinLabelVo>();
+		List<AllClockinLabelVo> listSelectClockinLabelVo = new ArrayList<AllClockinLabelVo>();
 		
 		List<Integer> listCustClockinLabelId = this.getListClockLabelId(customerInfoId);
 		// 先获取第一级标签
 		List<ClockinLabel> listClockinLabel = this.clockinLabelService.getListClockinLabelByPid(null);
 		for (ClockinLabel clockinLabel : listClockinLabel) {
-			SelectClockinLabelVo selectClockinLabelVo = new SelectClockinLabelVo();
+			AllClockinLabelVo selectClockinLabelVo = new AllClockinLabelVo();
 			selectClockinLabelVo.setClockinLabel(clockinLabel);
 			
 			//获取对应的二级标签
