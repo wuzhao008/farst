@@ -2,6 +2,8 @@ package com.farst.clockin.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 import com.farst.common.entity.BasicEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -39,16 +41,16 @@ public class ClockinSetting extends BasicEntity {
     private Integer popupLog;
 
     @ApiModelProperty(value = "设置的对应月份，当没有记录时设置为当前月份，有当前月份记录时设置下月月份，有下月记录时，则不能设置")
-    private LocalDate month;
+    private Date month;
 
     @ApiModelProperty(value = "正常删除状态(0正常,1为删除)")
     private Integer status;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createDate;
+    private Date createDate;
 
     @ApiModelProperty(value = "最近修改时间")
-    private LocalDateTime lastEditTime;
+    private Date lastEditTime;
 
 
 }

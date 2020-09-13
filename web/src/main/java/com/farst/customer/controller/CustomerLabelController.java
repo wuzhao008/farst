@@ -89,8 +89,7 @@ public class CustomerLabelController extends BasicController {
       				ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
      				ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getCustomerInfoId(), cl.getClockinLabelId());
      				
-      				ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
-     				clsVo.setId(cl.getId());
+      				ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo(); 
      				clsVo.setClockinLabel(label);
      				clsVo.setClockinSetting(setting);
      				
@@ -122,7 +121,6 @@ public class CustomerLabelController extends BasicController {
          		 }
          		 ClockinLabel label = this.clockinLabelService.getById(setting.getClockinLabelId());
          		 ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
-         		 clsVo.setId(id);
          		 clsVo.setClockinLabel(label);
          		 clsVo.setClockinSetting(setting);
             	 response.setSuccess(clsVo);
@@ -144,7 +142,7 @@ public class CustomerLabelController extends BasicController {
 
     @ApiOperation(value = "选择我的标签并保存")
     @PostMapping(value = "/selectMyLabel")
-    public RestResponse<String> editSex(@RequestHeader("tokenid") String tokenid,@RequestParam("labelIds") String labelIds){
+    public RestResponse<String> selectMyLabel(@RequestHeader("tokenid") String tokenid,@RequestParam("labelIds") String labelIds){
     	RestResponse<String> response = new RestResponse<>();
     	if(StringUtils.isEmpty(labelIds)) {
     		response.setErrorMsg("至少需要选择一个标签");
@@ -164,5 +162,7 @@ public class CustomerLabelController extends BasicController {
     	return response;
     }
     
+    
+
  
 }

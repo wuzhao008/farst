@@ -14,9 +14,6 @@ public class ClockinLabelSettingVo implements Serializable{
 	 
 	private static final long serialVersionUID = 1L;
 	
-	@ApiModelProperty(value = "主键id", required = true)
-	private Integer id;
-	
 	@ApiModelProperty(value = "标签信息", required = true)
 	private ClockinLabel clockinLabel;
 	
