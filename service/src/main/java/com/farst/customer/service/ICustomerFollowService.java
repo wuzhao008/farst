@@ -20,13 +20,39 @@ public interface ICustomerFollowService extends IBasicService<CustomerFollow> {
 	 * @param customerInfoId
 	 * @return
 	 */
-	IPage<CustomerInfo> getPageMyFollow(IPage<CustomerInfo> page,Integer customerInfoId);
+	public IPage<CustomerInfo> getPageMyFollow(IPage<CustomerInfo> page,Integer customerInfoId);
 	/**
 	 * 得到用户的粉丝分页信息
 	 * 
 	 * @param customerInfoId
 	 * @return
 	 */
-	IPage<CustomerInfo> getPageMyFans(IPage<CustomerInfo> page,Integer customerInfoId);
+	public IPage<CustomerInfo> getPageMyFans(IPage<CustomerInfo> page,Integer customerInfoId);
+
+	/**
+	 * 根据用户ID和关注的用户ID获的关注记录
+	 * 
+	 * @param customerInfoId
+	 * 
+	 * @param followCustomerInfoId
+	 * @return
+	 */
+	public CustomerFollow getCustomerFollowRecord(Integer customerInfoId,Integer followCustomerInfoId);
+	
+	/**
+	 * 关注用户
+	 * 
+	 * @param customerInfoId	当前用户id
+	 * @param followCustomerInfoId 	关注用户id
+	 */
+	public void follow(Integer customerInfoId,Integer followCustomerInfoId);
+
+	/**
+	 * 关注用户
+	 * 
+	 * @param customerInfoId	当前用户id
+	 * @param followCustomerInfoId 	取关用户id
+	 */
+	public void unfollow(Integer customerInfoId,Integer followCustomerInfoId);
 	
 }

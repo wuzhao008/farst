@@ -75,4 +75,44 @@ public class CustomerFollowController extends BasicController {
     	return response;
     } 
  
+
+    /**
+     * 关注某用户
+     */
+    @ApiOperation(value = "关注某用户")
+    @GetMapping(value = "/follow")
+    public RestResponse<String> follow(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "customerInfoId") int customerInfoId){
+        RestResponse<String> response = new RestResponse<>();
+    	try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		this.customerFollowService.follow(custId, customerInfoId);
+	    	response.setSuccess("关注成功");
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    } 
+    
+
+    /**
+     * 取关某用户
+     */
+    @ApiOperation(value = "取关某用户")
+    @GetMapping(value = "/unfollow")
+    public RestResponse<String> unfollow(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "customerInfoId") int customerInfoId){
+        RestResponse<String> response = new RestResponse<>();
+    	try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		this.customerFollowService.unfollow(custId, customerInfoId);
+	    	response.setSuccess("取关成功");
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    } 
+    
 }
