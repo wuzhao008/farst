@@ -1,7 +1,7 @@
 package com.farst.clockin.mapper;
 
 import com.farst.clockin.entity.ClockinReviewUp;
-import com.farst.common.mapper.BasicMapper;
+import com.farst.common.mybatis.mapper.BasicMapper;
 
 /**
  * <p>

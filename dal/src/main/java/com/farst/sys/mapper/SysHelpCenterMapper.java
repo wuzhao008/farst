@@ -1,7 +1,7 @@
 package com.farst.sys.mapper;
 
+import com.farst.common.mybatis.mapper.BasicMapper;
 import com.farst.sys.entity.SysHelpCenter;
-import com.farst.common.mapper.BasicMapper;
 
 /**
  * <p>

@@ -17,5 +17,34 @@
         id,
         customer_info_id, follow_customer_info_id, status, create_date, last_edit_time
     </sql>
+    
+    
+    <select id="selectPageMyFollow" resultType="com.farst.customer.vo.MyFollowVo">
+      SELECT b.*
+        FROM customer_follow a
+        JOIN `customer_info` b 
+          ON a.`follow_customer_info_id` = b.id 
+       WHERE a.`customer_info_id` = #{customerInfoId}
+         AND a.status = 0 
+         AND b.status = 0
+        ORDER BY b.id 
+    </select>
+    
+    
+    <select id="selectPageMyFans" resultType="com.farst.customer.vo.MyFansVo">
+      SELECT b.*,(case when c.id is null then false else true end) as hasFollow
+        FROM customer_follow a
+        JOIN `customer_info` b 
+          ON a.`customer_info_id` = b.id 
+        LEFT JOIN `customer_follow` c
+          ON c.`customer_info_id` = #{customerInfoId}
+         AND c.status = 0 
+         AND b.`id` = c.`follow_customer_info_id`
+       WHERE a.`follow_customer_info_id` = #{customerInfoId}
+         AND a.status = 0
+         AND b.status = 0 
+       ORDER BY b.id
+    </select>
+    
 
 </mapper>

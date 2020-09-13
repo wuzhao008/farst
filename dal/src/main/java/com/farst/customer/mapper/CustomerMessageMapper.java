@@ -1,7 +1,7 @@
 package com.farst.customer.mapper;
 
+import com.farst.common.mybatis.mapper.BasicMapper;
 import com.farst.customer.entity.CustomerMessage;
-import com.farst.common.mapper.BasicMapper;
 
 /**
  * <p>
