@@ -23,18 +23,15 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value="ClockinSetting对象", description="打卡设置")
 public class ClockinSetting extends BasicEntity {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L; 
 
-    @ApiModelProperty(value = "用户ID")
-    private Integer customerInfoId;
+    @ApiModelProperty(value = "用户标签ID")
+    private Integer customerLabelId;
 
-    @ApiModelProperty(value = "标签ID")
-    private Integer clockinLabelId;
-
-    @ApiModelProperty(value = "频率类型（1固定、2每周、3每月、4每年）")
+    @ApiModelProperty(value = "频率类型（1每周、2每月、3每年）")
     private Integer freqType;
 
-    @ApiModelProperty(value = "固定为0,1,5代表周格式的值，其他为每周每月每年时对应的天数")
+    @ApiModelProperty(value = "每周每月每年时对应的天数")
     private String freqValue;
 
     @ApiModelProperty(value = "是否自动弹出写日志")

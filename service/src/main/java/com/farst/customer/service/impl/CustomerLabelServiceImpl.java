@@ -5,8 +5,7 @@ import com.farst.customer.mapper.CustomerLabelMapper;
 import com.farst.customer.service.ICustomerLabelService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.farst.clockin.entity.ClockinLabel;
-import com.farst.clockin.service.IClockinLabelService;
-import com.farst.clockin.vo.ChildClockinLabelVo;
+import com.farst.clockin.service.IClockinLabelService; 
 import com.farst.clockin.vo.AllClockinLabelVo;
 import com.farst.common.service.impl.BasicServiceImpl;
 
@@ -48,30 +47,28 @@ public class CustomerLabelServiceImpl extends BasicServiceImpl<CustomerLabelMapp
 
 	@Override
 	public List<AllClockinLabelVo> getListSelectClockinLabelVo(Integer customerInfoId) {
-		
 		List<AllClockinLabelVo> listSelectClockinLabelVo = new ArrayList<AllClockinLabelVo>();
-		
 		List<Integer> listCustClockinLabelId = this.getListClockLabelId(customerInfoId);
 		// 先获取第一级标签
 		List<ClockinLabel> listClockinLabel = this.clockinLabelService.getListClockinLabelByPid(null);
 		for (ClockinLabel clockinLabel : listClockinLabel) {
 			AllClockinLabelVo selectClockinLabelVo = new AllClockinLabelVo();
 			selectClockinLabelVo.setClockinLabel(clockinLabel);
-			
 			//获取对应的二级标签
-			List<ChildClockinLabelVo> listChildClockinLabelVo = new ArrayList<ChildClockinLabelVo>();
 			List<ClockinLabel> listChildClockinLabel = this.clockinLabelService
 					.getListClockinLabelByPid(clockinLabel.getId());
+			List<ClockinLabel> listChildClockinLabel_ = new ArrayList<ClockinLabel>();
 			for(ClockinLabel childClockinLabel : listChildClockinLabel) {
-				ChildClockinLabelVo childClockinLabelVo = new ChildClockinLabelVo();
-				childClockinLabelVo.setClockinLabel(childClockinLabel);
-				//判断当前用户是否选中了此标签
+				//判断当前用户是否选中了此标签,没有选中的标签才让用户选
 				boolean hasSelected = listCustClockinLabelId.contains(childClockinLabel.getId()) ? true : false;
-				childClockinLabelVo.setHasSelected(hasSelected);
-				listChildClockinLabelVo.add(childClockinLabelVo);
+				if(hasSelected == false) {
+					listChildClockinLabel_.add(childClockinLabel);
+				}
 			}
-			selectClockinLabelVo.setChildClockinLabelVos(listChildClockinLabelVo);
-			listSelectClockinLabelVo.add(selectClockinLabelVo);
+			if(CollectionUtils.isNotEmpty(listChildClockinLabel_)) {
+				selectClockinLabelVo.setChildClockinLabels(listChildClockinLabel_);
+				listSelectClockinLabelVo.add(selectClockinLabelVo);
+			}
 		}
 		return listSelectClockinLabelVo;
 	}
@@ -96,35 +93,18 @@ public class CustomerLabelServiceImpl extends BasicServiceImpl<CustomerLabelMapp
 	}
 
 	@Override
-	public void updCustomerLabel(Integer customerInfoId, List<Integer> listLabelId) {
-		//先将原选择标签置为删除标记
-		List<CustomerLabel> listCustomerLabel = this.getListCustomerLabel(customerInfoId);
-		if(CollectionUtils.isNotEmpty(listCustomerLabel)) {
-			for(CustomerLabel customerLabel : listCustomerLabel) {
-				customerLabel.setStatus(1);
-				customerLabel.setLastEditTime(new Date());
-				this.saveOrUpdate(customerLabel);
-			}
-		}
-		//循环新标签ID，不存在数据库则新增，存在则修改删除标记为正常
+	public void addCustomerLabel(Integer customerInfoId, List<Integer> listLabelId) {
+		//循环新标签ID
 		if(CollectionUtils.isNotEmpty(listLabelId)) {
 			for(Integer labelId : listLabelId) {
-				CustomerLabel customerLabel = this.getCustomerLabelRecord(customerInfoId, labelId);
-				if(customerLabel != null) {
-					customerLabel.setStatus(0);
-					customerLabel.setLastEditTime(new Date());
-				}else {
-					customerLabel = new CustomerLabel();
-					customerLabel.setCustomerInfoId(customerInfoId);
-					customerLabel.setClockinLabelId(labelId);
-					customerLabel.setStatus(0);
-					customerLabel.setCreateDate(new Date());
-				}
-				this.saveOrUpdate(customerLabel);
+				CustomerLabel customerLabel = new CustomerLabel();
+				customerLabel.setCustomerInfoId(customerInfoId);
+				customerLabel.setClockinLabelId(labelId);
+				customerLabel.setStatus(0);
+				customerLabel.setCreateDate(new Date());
+				this.save(customerLabel); 
 			}
 		}
-		
-		
 	}
 
 }

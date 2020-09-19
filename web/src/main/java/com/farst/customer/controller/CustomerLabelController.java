@@ -50,19 +50,19 @@ public class CustomerLabelController extends BasicController {
     private IClockinLabelService clockinLabelService;
     
     @Autowired
-    private IClockinSettingService clockinSettingService;
+    private IClockinSettingService clockinSettingService; 
     
     /**
-     * 根据用户查询所有标签信息
+     * 根据用户查询所有当前用户还未选择的标签信息
      */
-    @ApiOperation(value = "所有标签习惯信息-含当前用户是否已选择标记")
+    @ApiOperation(value = "所有还未选择的标签习惯信息")
     @GetMapping(value = "/getAllListLabel")
     public RestResponse<List<AllClockinLabelVo>> getListLabel(@RequestHeader("tokenid") String tokenid){
       	 RestResponse<List<AllClockinLabelVo>> response = new RestResponse<>();
       	List<AllClockinLabelVo> listSCLVo = new ArrayList<AllClockinLabelVo>();
          try {
      		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-     		listSCLVo = this.customerLabelService.getListSelectClockinLabelVo(custId);
+     		 listSCLVo = this.customerLabelService.getListSelectClockinLabelVo(custId);
         	 response.setSuccess(listSCLVo);
          } catch (Exception e) {
             e.printStackTrace();
@@ -85,14 +85,11 @@ public class CustomerLabelController extends BasicController {
      		 List<CustomerLabel> listCl = this.customerLabelService.getListCustomerLabel(custId);
      		 if(CollectionUtils.isNotEmpty(listCl)) {
      			 for(CustomerLabel cl : listCl) {
-     				 
       				ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
-     				ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getCustomerInfoId(), cl.getClockinLabelId());
-     				
-      				ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo(); 
+     				ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getId());
+      				ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();  
      				clsVo.setClockinLabel(label);
      				clsVo.setClockinSetting(setting);
-     				
      				listMyClsVo.add(clsVo);
      			 }
      		 }
@@ -109,26 +106,22 @@ public class CustomerLabelController extends BasicController {
      * 根据ID查询标签习惯设置信息
      */
     @ApiOperation(value = "根据ID查询标签习惯设置信息")
-    @GetMapping(value = "/getLabelSettingById")
-    public RestResponse<ClockinLabelSettingVo> getLabelSettingById(@RequestHeader("tokenid") String tokenid,@RequestParam("id") Integer id){
+    @GetMapping(value = "/getLabelSettingByCustomerLabelId")
+    public RestResponse<ClockinLabelSettingVo> getLabelSettingById(@RequestHeader("tokenid") String tokenid,@RequestParam("customerLabelId") Integer customerLabelId){
       	 RestResponse<ClockinLabelSettingVo> response = new RestResponse<>(); 
-         try { 
-             try {
-         		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-         		 ClockinSetting setting = this.clockinSettingService.getById(id);
-         		 if(setting.getCustomerInfoId() != custId) {
-         			 response.setErrorMsg("非法请求");
-         		 }
-         		 ClockinLabel label = this.clockinLabelService.getById(setting.getClockinLabelId());
-         		 ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
-         		 clsVo.setClockinLabel(label);
-         		 clsVo.setClockinSetting(setting);
-            	 response.setSuccess(clsVo);
-             } catch (Exception e) {
-                e.printStackTrace();
-                logger.error(e.getMessage());
-                response.setErrorMsg(e.getMessage());
-             }
+         try {
+     		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		 CustomerLabel cl = this.customerLabelService.getById(customerLabelId);
+     		 ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getId());
+     		 if(cl.getCustomerInfoId() != custId || cl.getStatus() != 0) {
+     			 response.setErrorMsg("非法请求");
+     			 return response; 
+     		 }
+     		 ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
+     		 ClockinLabelSettingVo clsVo = new ClockinLabelSettingVo();
+     		 clsVo.setClockinLabel(label);
+     		 clsVo.setClockinSetting(setting);
+        	 response.setSuccess(clsVo); 
              return response;
          } catch (Exception e) {
             e.printStackTrace();
@@ -154,14 +147,13 @@ public class CustomerLabelController extends BasicController {
     		for(String labelId : arrLabelId) {
     			listLabelId.add(Integer.valueOf(labelId));
     		}
-    		this.customerLabelService.updCustomerLabel(custId, listLabelId);
+    		this.customerLabelService.addCustomerLabel(custId, listLabelId);
     		response.setSuccess(null, "选择标签并保存成功");
     	}catch(Exception e) {
     		response.setErrorMsg(e.getMessage());
     	}
     	return response;
     }
-    
     
 
  

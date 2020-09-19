@@ -6,11 +6,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data 
-@ApiModel(value="打开规则dto", description="打卡规则dto")
+@ApiModel(value="打卡规则dto", description="打卡规则dto")
 public class ClockinSettingDto {
 	
-    @ApiModelProperty(value = "标签ID")
-    private Integer clockinLabelId;
+    @ApiModelProperty(value = "客户标签关系ID")
+    private Integer customerLabelId;
 
     @ApiModelProperty(value = "频率类型（1固定、2每周、3每月、4每年）")
     private Integer freqType;

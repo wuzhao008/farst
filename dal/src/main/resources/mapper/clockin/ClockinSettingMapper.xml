@@ -5,8 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.farst.clockin.entity.ClockinSetting">
         <result column="id" property="id" />
-        <result column="customer_info_id" property="customerInfoId" />
-        <result column="clockin_label_id" property="clockinLabelId" />
+        <result column="customer_label_id" property="customerLabelId" />
         <result column="freq_type" property="freqType" />
         <result column="freq_value" property="freqValue" />
         <result column="popup_log" property="popupLog" />
@@ -18,8 +17,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id,
-        customer_info_id, clockin_label_id, freq_type, freq_value, popup_log, month, status, create_date, last_edit_time
+        id,customer_label_id, freq_type, freq_value, popup_log, month, status, create_date, last_edit_time
     </sql>
 
 </mapper>

@@ -59,7 +59,7 @@ public class CustomerInfoController extends BasicController {
     private final String KEY_PREFIX_FARST_SMS_VERIFY_CODE = "FARST_SMS_VERIFY_CODE_";
     
     //tokenid缓存过期时间
-    private final long TOKENID_EXPIRE = 1000 * 60 * 60 * 24 * 1L;
+    private final long TOKENID_EXPIRE = 1000 * 60 * 60 * 24 * 30L;
     
     /**
 	 * 登陆接口

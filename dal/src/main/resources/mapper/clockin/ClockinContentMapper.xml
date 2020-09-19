@@ -19,5 +19,62 @@
         id,
         customer_info_id, clockin_label_id, content, check_status, status, create_date, last_edit_time
     </sql>
+    
+    
+    <select id="selectPageTodayClockinVo" resultType="com.farst.clockin.vo.TodayClockinVo">
+      select t.*,round(statistics_clockin_days/statistics_days,0) as statistics_rate
+		from (select  
+		       c.`id` as label_id,
+		       c.`label_name`, 
+			   c.`label_pic_url`,
+			   d.id,
+			   a.`freq_type` as statistics_type,
+			   a.`freq_value` as statistics_days,
+			   (
+			   case when a.`freq_type` = 1 then 
+			   		(
+			   		select count(d.`id`) 
+			   		  from `clockin_content` d 
+			   		 where d.customer_info_id = #{customerInfoId}
+			   		   and d.`clockin_label_id` = b.id 
+			   		   and d.`status` = 0
+			   		   and d.`create_date` BETWEEN subdate(curdate(),date_format(curdate(),'%w')-1) and subdate(curdate(),date_format(curdate(),'%w')-8)
+			   		)
+			   		when a.`freq_type` = 2 then 
+			   		(
+			   		select count(d.`id`) 
+			   		  from `clockin_content` d 
+			   		 where d.customer_info_id = #{customerInfoId}
+			   		   and d.`clockin_label_id` = b.id 
+			   		   and d.`status` = 0
+			   		   and d.`create_date` BETWEEN date_add(curdate(),interval -day(curdate())+1 day) and date_add(last_day(curdate()),interval 1 day)
+			   		)
+			   		when a.`freq_type` = 3 then
+			   		(
+			   		select count(d.`id`) 
+			   		  from `clockin_content` d 
+			   		 where d.customer_info_id = #{customerInfoId}
+			   		   and d.`clockin_label_id` = b.id 
+			   		   and d.`status` = 0
+			   		   and d.`create_date` BETWEEN DATE_SUB(CURDATE(),INTERVAL dayofyear(now())-1 DAY) and concat(YEAR(now()),'-12-31 23:59:59')
+			   		)
+			   end 
+			   ) as statistics_clockin_days
+		 from (select * from `clockin_setting` where month &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d') order by month desc limit 1)a
+		join `customer_label` b 
+		on a.`customer_label_id` = b.id 
+		join `clockin_label` c 
+		on b.`clockin_label_id` = c.id
+		left join `clockin_content` d
+		on d.`clockin_label_id` = b.`clockin_label_id`
+		and d.`customer_info_id` = #{customerInfoId}
+		and d.`status` = 0 
+		and DATE_FORMAT(d.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') 
+		where b.`customer_info_id` = #{customerInfoId}
+		  and a.`status` = 0 
+		  and b.`status` = 0
+		  and c.`status` = 0) t
+		  order by t.`statistics_type` asc ,round(statistics_clockin_days/statistics_days,0) asc
+    </select>
 
 </mapper>

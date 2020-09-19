@@ -52,12 +52,12 @@ public interface ICustomerLabelService extends IBasicService<CustomerLabel> {
 	
 	
 	/**
-	 * 更新用户新标签
+	 * 增加用户新标签
 	 * 
 	 * @param customerInfoId
 	 * @param listLabelId
 	 */
-	public void updCustomerLabel(Integer customerInfoId,List<Integer> listLabelId);
+	public void addCustomerLabel(Integer customerInfoId,List<Integer> listLabelId);
 	
 	/**
 	 * 获取用户标签-不论状态

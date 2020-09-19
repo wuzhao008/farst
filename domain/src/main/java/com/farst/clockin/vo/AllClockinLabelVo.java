@@ -17,6 +17,6 @@ public class AllClockinLabelVo implements Serializable{
 	private ClockinLabel clockinLabel;
 	
 	@ApiModelProperty(value = "子标签信息", required = true)
-	private List<ChildClockinLabelVo> childClockinLabelVos;
+	private List<ClockinLabel> childClockinLabels;
 	
 }

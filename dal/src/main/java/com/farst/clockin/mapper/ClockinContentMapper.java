@@ -1,7 +1,11 @@
 package com.farst.clockin.mapper;
 
+import org.apache.ibatis.annotations.Param;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.farst.clockin.entity.ClockinContent;
-import com.farst.common.mybatis.mapper.BasicMapper;
+import com.farst.clockin.vo.TodayClockinVo;
+import com.farst.common.mybatis.mapper.BasicMapper; 
 
 /**
  * <p>
@@ -12,5 +16,7 @@ import com.farst.common.mybatis.mapper.BasicMapper;
  * @since 2020-09-07
  */
 public interface ClockinContentMapper extends BasicMapper<ClockinContent> {
-
+	
+	IPage<TodayClockinVo> selectPageTodayClockinVo(IPage<TodayClockinVo> page,@Param("customerInfoId") Integer customerInfoId);
+	
 }

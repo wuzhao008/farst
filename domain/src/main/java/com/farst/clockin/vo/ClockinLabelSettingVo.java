@@ -12,7 +12,7 @@ import lombok.Data;
 @ApiModel(value = "标签以及标签设置VO")
 public class ClockinLabelSettingVo implements Serializable{
 	 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L; 
 	
 	@ApiModelProperty(value = "标签信息", required = true)
 	private ClockinLabel clockinLabel;
