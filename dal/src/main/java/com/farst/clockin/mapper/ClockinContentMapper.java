@@ -19,4 +19,6 @@ public interface ClockinContentMapper extends BasicMapper<ClockinContent> {
 	
 	IPage<TodayClockinVo> selectPageTodayClockinVo(IPage<TodayClockinVo> page,@Param("customerInfoId") Integer customerInfoId);
 	
+	ClockinContent selectTodayClockinContent(Integer customerInfoId,Integer clockinLabelId);
+	
 }

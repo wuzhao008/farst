@@ -67,4 +67,12 @@ public interface ICustomerLabelService extends IBasicService<CustomerLabel> {
 	 * @return
 	 */
 	public CustomerLabel getCustomerLabelRecord(Integer customerInfoId,Integer labelId);
+	
+	/**
+	 * 获取用户标签
+	 * @param customerInfoId
+	 * @param labelId
+	 * @return
+	 */
+	public CustomerLabel getCustomerLabel(Integer customerInfoId,Integer labelId);
 }

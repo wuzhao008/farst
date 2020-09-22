@@ -24,6 +24,9 @@ public class TodayClockinVo implements Serializable{
 	@ApiModelProperty(value = "标签图片", required = true)
 	private String labelPicUrl;
 	
+	@ApiModelProperty(value = "是否自动弹出日志", required = true)
+	private Integer PopupLog;
+	
 	@ApiModelProperty(value = "统计类型（1按周、2按月、3按年）", required = true)
 	private Integer statisticsType;
 

@@ -7,6 +7,7 @@
         <result column="id" property="id" />
         <result column="customer_info_id" property="customerInfoId" />
         <result column="clockin_label_id" property="clockinLabelId" />
+        <result column="is_public" property="isPublic"/>
         <result column="content" property="content" />
         <result column="check_status" property="checkStatus" />
         <result column="status" property="status" />
@@ -17,9 +18,16 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        customer_info_id, clockin_label_id, content, check_status, status, create_date, last_edit_time
+        customer_info_id, clockin_label_id, is_public,content, check_status, status, create_date, last_edit_time
     </sql>
     
+    <select id ="selectTodayClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
+    	select * from clockin_content 
+    	 where customer_info_id = #{customerInfoId} 
+    	   and clockin_label_id = #{clockinLabelId} 
+    	   and to_days(create_date) = to_days(now()) 
+    	   and status = 0
+    </select>
     
     <select id="selectPageTodayClockinVo" resultType="com.farst.clockin.vo.TodayClockinVo">
       select t.*,round(statistics_clockin_days/statistics_days,0) as statistics_rate
@@ -28,6 +36,7 @@
 		       c.`label_name`, 
 			   c.`label_pic_url`,
 			   d.id,
+			   a.`popup_log`,
 			   a.`freq_type` as statistics_type,
 			   a.`freq_value` as statistics_days,
 			   (

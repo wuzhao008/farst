@@ -34,7 +34,7 @@ import com.farst.common.web.controller.BasicController;
  * @since 2020-09-07
  * @version v1.0
  */
-@Api(tags = {"用户打卡标签"})
+@Api(tags = {"用户习惯"})
 @RestController
 @RequestMapping("/customer/customerLabel")
 public class CustomerLabelController extends BasicController {
@@ -53,9 +53,9 @@ public class CustomerLabelController extends BasicController {
     private IClockinSettingService clockinSettingService; 
     
     /**
-     * 根据用户查询所有当前用户还未选择的标签信息
+     * 根据用户查询所有当前用户还未选择的习惯信息
      */
-    @ApiOperation(value = "所有还未选择的标签习惯信息")
+    @ApiOperation(value = "所有还未选择的习惯信息")
     @GetMapping(value = "/getAllListLabel")
     public RestResponse<List<AllClockinLabelVo>> getListLabel(@RequestHeader("tokenid") String tokenid){
       	 RestResponse<List<AllClockinLabelVo>> response = new RestResponse<>();
@@ -73,9 +73,9 @@ public class CustomerLabelController extends BasicController {
     }
     
     /**
-     * 查询我的标签习惯设置信息列表
+     * 查询我的习惯设置信息列表
      */
-    @ApiOperation(value = "我的标签习惯设置列表信息")
+    @ApiOperation(value = "我的习惯设置列表信息")
     @GetMapping(value = "/getMyListLabelSetting")
     public RestResponse<List<ClockinLabelSettingVo>> getMyListLabelSetting(@RequestHeader("tokenid") String tokenid){
       	 RestResponse<List<ClockinLabelSettingVo>> response = new RestResponse<>();
@@ -103,9 +103,9 @@ public class CustomerLabelController extends BasicController {
     }
     
     /**
-     * 根据ID查询标签习惯设置信息
+     * 根据ID查询习惯设置信息
      */
-    @ApiOperation(value = "根据ID查询标签习惯设置信息")
+    @ApiOperation(value = "根据ID查询习惯设置信息")
     @GetMapping(value = "/getLabelSettingByCustomerLabelId")
     public RestResponse<ClockinLabelSettingVo> getLabelSettingById(@RequestHeader("tokenid") String tokenid,@RequestParam("customerLabelId") Integer customerLabelId){
       	 RestResponse<ClockinLabelSettingVo> response = new RestResponse<>(); 
@@ -133,12 +133,12 @@ public class CustomerLabelController extends BasicController {
     
     
 
-    @ApiOperation(value = "选择我的标签并保存")
+    @ApiOperation(value = "选择我的习惯并保存")
     @PostMapping(value = "/selectMyLabel")
     public RestResponse<String> selectMyLabel(@RequestHeader("tokenid") String tokenid,@RequestParam("labelIds") String labelIds){
     	RestResponse<String> response = new RestResponse<>();
     	if(StringUtils.isEmpty(labelIds)) {
-    		response.setErrorMsg("至少需要选择一个标签");
+    		response.setErrorMsg("至少需要选择一个习惯");
     	}
     	try {
     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
@@ -148,7 +148,7 @@ public class CustomerLabelController extends BasicController {
     			listLabelId.add(Integer.valueOf(labelId));
     		}
     		this.customerLabelService.addCustomerLabel(custId, listLabelId);
-    		response.setSuccess(null, "选择标签并保存成功");
+    		response.setSuccess(null, "选择习惯并保存成功");
     	}catch(Exception e) {
     		response.setErrorMsg(e.getMessage());
     	}

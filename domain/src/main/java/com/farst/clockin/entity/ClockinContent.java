@@ -1,6 +1,6 @@
-package com.farst.clockin.entity;
+package com.farst.clockin.entity; 
+import java.util.Date;
 
-import java.time.LocalDateTime;
 import com.farst.common.entity.BasicEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,6 +28,9 @@ public class ClockinContent extends BasicEntity {
     @ApiModelProperty(value = "标签ID")
     private Integer clockinLabelId;
 
+    @ApiModelProperty(value = "是否公开")
+    private Integer isPublic;
+
     @ApiModelProperty(value = "内容")
     private String content;
 
@@ -38,10 +41,10 @@ public class ClockinContent extends BasicEntity {
     private Integer status;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createDate;
+    private Date createDate;
 
     @ApiModelProperty(value = "最近修改时间")
-    private LocalDateTime lastEditTime;
+    private Date lastEditTime;
 
 
 }

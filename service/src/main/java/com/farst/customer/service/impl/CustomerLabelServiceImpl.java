@@ -107,4 +107,11 @@ public class CustomerLabelServiceImpl extends BasicServiceImpl<CustomerLabelMapp
 		}
 	}
 
+	@Override
+	public CustomerLabel getCustomerLabel(Integer customerInfoId, Integer labelId) {
+		QueryWrapper<CustomerLabel> queryWrapper = new QueryWrapper<CustomerLabel>();
+		queryWrapper.eq("customer_info_id", customerInfoId).eq("clockin_label_id", labelId).eq("status", 0);
+		return this.getOne(queryWrapper);
+	}
+
 }

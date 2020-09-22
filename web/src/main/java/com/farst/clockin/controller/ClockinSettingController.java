@@ -71,7 +71,7 @@ public class ClockinSettingController extends BasicController {
      			cs.setMonth(month);
      			cs.setStatus(0);
      			this.clockinSettingService.save(cs);
-                response.setSuccess("目标规则设置成功");
+                response.setSuccess("习惯规则设置成功");
      		}else {
      			//如果修改内容没有变，则直接返回
      			if(cs.getFreqType().equals(clockinSettingDto.getFreqType())
@@ -87,7 +87,7 @@ public class ClockinSettingController extends BasicController {
      			//如果最新规则日期是下一月的，则直接更新
      			if(strMonth.equals(strNextMonth)) {
      				if(clockinSettingDto.getFreqType().equals(cs.getFreqType()) == false) {
-     					response.setErrorMsg("目标规则类型不能更改，如想修改，请先删除后重新维护");
+     					response.setErrorMsg("习惯规则类型不能更改，如想修改，请先删除后重新维护");
      					return response;
      				}
      				//弹出方式最新规则同步修改
@@ -102,7 +102,7 @@ public class ClockinSettingController extends BasicController {
      			//如果下一月还没有设置规则，则新增下一月规则
      			else if(strNextMonth.compareTo(strMonth)>0){
      				if(clockinSettingDto.getFreqType().equals(cs.getFreqType()) == false) {
-     					response.setErrorMsg("目标规则类型不能更改，如想修改，请先删除后重新维护");
+     					response.setErrorMsg("习惯规则类型不能更改，如想修改，请先删除后重新维护");
      					return response;
      				}
      				//弹出方式最新的修改
@@ -118,7 +118,7 @@ public class ClockinSettingController extends BasicController {
          			this.clockinSettingService.save(cs);
      				response.setSuccess("新规则设置成功，将在下一个周期生效");
      			}else {
-     				response.setErrorMsg("设置目标规则出现异常");
+     				response.setErrorMsg("设置习惯规则出现异常");
      				return response;
      			}
      		} 
