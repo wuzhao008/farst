@@ -18,5 +18,17 @@
         id,
         customer_info_id, clockin_content_id, content, status, create_date, last_edit_time
     </sql>
+    
+	<!-- 根据内容id列表得到对应的评论数列表 -->
+	<select id="selectMapReviewCountsByListContentId" resultType="java.util.Map">
+		    select `clockin_content_id` as id,count(id) as cnt 
+			  from `clockin_review`
+			 where `clockin_content_id` in
+			 <foreach item="contentId" collection="list" separator="," open="(" close=")" index="">
+		     		#{contentId, jdbcType=NUMERIC}
+		     </foreach>
+			   and `status` = 0
+			group by `clockin_content_id`
+	</select>
 
 </mapper>

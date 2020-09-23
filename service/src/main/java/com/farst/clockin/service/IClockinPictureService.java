@@ -23,4 +23,12 @@ public interface IClockinPictureService extends IBasicService<ClockinPicture> {
 	 */
 	List<ClockinPicture> getAllClockinPictureByContentId(Integer contentId);
 	
+	/**
+	 * 根据内容ID列表获取对应的图片列表
+	 * 
+	 * @param listContentId
+	 * @return
+	 */
+	List<ClockinPicture> getAllClockinPictureByListContentId(List<Integer> listContentId);
+	
 }

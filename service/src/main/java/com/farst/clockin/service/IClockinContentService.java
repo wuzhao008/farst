@@ -26,8 +26,19 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 */
 	public IPage<TodayClockinVo> getPageTodayClockinVo(IPage<TodayClockinVo> page,Integer customerInfoId);
 	
+	
 	/**
-	 * 得到当天用户对应标签的打卡内容
+	 * 得到和我同习惯的打卡列表
+	 * 
+	 * @param page
+	 * @param customerInfoId
+	 * @return
+	 */
+	public IPage<ClockinContent> getPageSimilarClockinContent(IPage<ClockinContent> page,Integer customerInfoId);
+	
+	
+	/**
+	 * 得到当天用户对应习惯的打卡内容
 	 * 
 	 * @param customerInfoId
 	 * @param labelId
@@ -36,7 +47,7 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	public ClockinContent getTodayClockinContent(Integer customerInfoId,Integer labelId);
 	
 	/**
-	 * 得到当天用户对应标签打卡内容VO（含图片url）
+	 * 得到当天用户对应习惯打卡内容VO（含图片url）
 	 * @param customerInfoId
 	 * @param labelId
 	 * @return

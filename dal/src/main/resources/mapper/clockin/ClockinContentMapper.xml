@@ -85,5 +85,23 @@
 		  and c.`status` = 0) t
 		  order by t.`statistics_type` asc ,round(statistics_clockin_days/statistics_days,0) asc
     </select>
+    
+    
+    <select id="selectPageSimilarClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
+    	select a.* 
+		  from clockin_content a
+		 where a.`customer_info_id` != #{customerInfoId}
+		   and a.`status` = 0
+		   and a.`is_public` = 1
+		   and a.`check_status` = 1
+		   and a.`content` is not null
+		   and a.`clockin_label_id` in (
+		  	select b.`clockin_label_id` 
+		  	  from `customer_label` b 
+		  	 where b.`status` = 0 
+		  	   and b.`customer_info_id` = #{customerInfoId}
+		   )
+		order by a.`create_date` desc 
+    </select>
 
 </mapper>

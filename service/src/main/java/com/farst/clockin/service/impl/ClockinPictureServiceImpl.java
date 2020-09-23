@@ -28,4 +28,11 @@ public class ClockinPictureServiceImpl extends BasicServiceImpl<ClockinPictureMa
 		return this.list(queryWrapper);
 	}
 
+	@Override
+	public List<ClockinPicture> getAllClockinPictureByListContentId(List<Integer> listContentId) {
+		QueryWrapper<ClockinPicture> queryWrapper = new QueryWrapper<ClockinPicture>();
+		queryWrapper.eq("status", 0).in("clockin_content_id", listContentId).orderByAsc("clockin_content_id").orderByAsc("sort"); 
+		return this.list(queryWrapper);
+	}
+
 }

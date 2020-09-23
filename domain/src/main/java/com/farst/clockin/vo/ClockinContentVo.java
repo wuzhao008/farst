@@ -3,8 +3,8 @@ package com.farst.clockin.vo;
 import java.io.Serializable;
 import java.util.List;
 
-import com.farst.clockin.entity.ClockinContent;
-import com.farst.clockin.entity.ClockinPicture;
+import com.farst.clockin.entity.ClockinContent; 
+import com.farst.clockin.entity.ClockinPicture; 
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +19,7 @@ public class ClockinContentVo implements Serializable{
 	@ApiModelProperty(value = "打卡内容", required = true)
 	private ClockinContent clockinContent;
 	
-	@ApiModelProperty(value = "打卡图片")
+	@ApiModelProperty(value = "打卡图片", required = true)
 	private List<ClockinPicture> clockinPictures;
 	
 }

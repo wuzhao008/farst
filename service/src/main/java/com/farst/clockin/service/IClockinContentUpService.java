@@ -1,5 +1,8 @@
 package com.farst.clockin.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.farst.clockin.entity.ClockinContentUp;
 import com.farst.common.service.IBasicService;
 
@@ -12,5 +15,13 @@ import com.farst.common.service.IBasicService;
  * @since 2020-09-07
  */
 public interface IClockinContentUpService extends IBasicService<ClockinContentUp> {
-
+	
+	/**
+	 * 根据内容ID列表，得到每条对应的UP数
+	 * 
+	 * @param listContentId
+	 * @return
+	 */
+	public List<Map<String,Object>> getMapContentUpsByListContentId(List<Integer> listContentId);
+	
 }

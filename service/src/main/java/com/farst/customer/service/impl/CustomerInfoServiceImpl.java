@@ -14,6 +14,8 @@ import com.farst.common.exception.ServiceException;
 import com.farst.common.service.impl.BasicServiceImpl;
 import com.farst.common.utils.JwtUtils;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -48,6 +50,13 @@ public class CustomerInfoServiceImpl extends BasicServiceImpl<CustomerInfoMapper
 			throw new ServiceException("获取用户信息失败",e);
 		}
 		return tokenCustVo;
+	}
+
+	@Override
+	public List<CustomerInfo> getListCustomerInfoBy(List<Integer> listCustId) {
+		QueryWrapper<CustomerInfo> queryWrapper = new QueryWrapper<CustomerInfo>();
+		queryWrapper.eq("status", 0).in("id", listCustId);
+		return this.list(queryWrapper);
 	} 
 	
 }

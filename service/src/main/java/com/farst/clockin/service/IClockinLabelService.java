@@ -23,4 +23,12 @@ public interface IClockinLabelService extends IBasicService<ClockinLabel> {
 	 * @return
 	 */
 	public List<ClockinLabel> getListClockinLabelByPid(Integer pid);
+	
+	/**
+	 * 根据标签ID列表获取标签信息列表
+	 *  
+	 * @param listLabelId 
+	 * @return
+	 */
+	public List<ClockinLabel> getListClockinLabelByListId(List<Integer> listLabelId);
 }

@@ -33,4 +33,11 @@ public class ClockinLabelServiceImpl extends BasicServiceImpl<ClockinLabelMapper
 		return this.list(queryWrapper);
 	}
 
+	@Override
+	public List<ClockinLabel> getListClockinLabelByListId(List<Integer> listLabelId) {
+		QueryWrapper<ClockinLabel> queryWrapper = new QueryWrapper<ClockinLabel>();
+		queryWrapper.eq("status", 0).in("id", listLabelId);
+		return this.list(queryWrapper);
+	}
+
 }

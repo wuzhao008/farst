@@ -40,6 +40,11 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	}
 	
 	@Override
+	public IPage<ClockinContent> getPageSimilarClockinContent(IPage<ClockinContent> page,Integer customerInfoId){
+		return this.clockinContentMapper.selectPageSimilarClockinContent(page, customerInfoId);
+	}
+	
+	@Override
 	public ClockinContent getTodayClockinContent(Integer customerInfoId, Integer labelId) {
 		return this.clockinContentMapper.selectTodayClockinContent(customerInfoId, labelId);
 	}
