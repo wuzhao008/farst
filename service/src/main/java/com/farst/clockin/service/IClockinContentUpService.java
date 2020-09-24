@@ -24,4 +24,37 @@ public interface IClockinContentUpService extends IBasicService<ClockinContentUp
 	 */
 	public List<Map<String,Object>> getMapContentUpsByListContentId(List<Integer> listContentId);
 	
+	/**
+	 * 根据内容ID列表，获取当前用户有顶过的内容ID
+	 * @param listContents
+	 * @return
+	 */
+	public List<Integer> getMyUpContentIds(List<Integer> listContentId,Integer customerInfoId);
+	
+	/**
+	 * 根据内容ID得到顶的数量
+	 * 
+	 * @param clockinContentId
+	 * @return
+	 */
+	public Long getUpCountByContentId(Integer clockinContentId);
+	
+	/**
+	 * 查询当前用户是否点赞这个日志
+	 * 
+	 * @param clockinContentId
+	 * @param customerInfoId
+	 * @return
+	 */
+	public boolean hasUpClockinContent(Integer clockinContentId,Integer customerInfoId);
+	
+	/**
+	 * 根据用户ID和内容ID得到点赞记录
+	 * 
+	 * @param customerInfoId
+	 * @param clockinContentId
+	 * @return
+	 */
+	public ClockinContentUp getClockinContentRecord(Integer customerInfoId,Integer clockinContentId);
+	
 }

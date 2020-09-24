@@ -35,6 +35,16 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @return
 	 */
 	public IPage<ClockinContent> getPageSimilarClockinContent(IPage<ClockinContent> page,Integer customerInfoId);
+
+	/**
+	 * 得到我的打卡列表
+	 * 
+	 * @param page
+	 * @param customerInfoId
+	 * @return
+	 */
+	public IPage<ClockinContent> getPageMyClockinContent(IPage<ClockinContent> page,Integer customerInfoId);
+	
 	
 	
 	/**
@@ -80,6 +90,14 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @param isPublic
 	 */
 	public void publishTodayClockinContent(Integer customerInfoId,Integer labelId,String content,List<String> picUrls,Integer isPublic);
+	
+	/**
+	 * 修改id对应记录的content
+	 * 
+	 * @param id
+	 * @param content
+	 */
+	public void updateContent(Integer id,String content);
 	
 	
 }

@@ -103,5 +103,22 @@
 		   )
 		order by a.`create_date` desc 
     </select>
+    
+    
+    <select id="selectPageMyClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
+    	select a.* 
+		  from clockin_content a
+		 where a.`customer_info_id` = #{customerInfoId}
+		   and a.`status` = 0
+		   and a.`is_public` in(0,1)
+		   and a.`check_status` = 1
+		   and a.`content` is not null
+		order by a.`create_date` desc 
+    </select>
+    
+    <update id="updateContent">
+    	update clockin_content set content = #{content},last_edit_time = NOW() where id = #{id}
+    </update>
+    
 
 </mapper>

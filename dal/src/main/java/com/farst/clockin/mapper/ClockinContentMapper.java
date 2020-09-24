@@ -18,8 +18,12 @@ import com.farst.common.mybatis.mapper.BasicMapper;
 public interface ClockinContentMapper extends BasicMapper<ClockinContent> {
 	
 	IPage<TodayClockinVo> selectPageTodayClockinVo(IPage<TodayClockinVo> page,@Param("customerInfoId") Integer customerInfoId);
-	
+
 	IPage<ClockinContent> selectPageSimilarClockinContent(IPage<ClockinContent> page,@Param("customerInfoId") Integer customerInfoId);
+	
+	IPage<ClockinContent> selectPageMyClockinContent(IPage<ClockinContent> page,@Param("customerInfoId") Integer customerInfoId);
+	
+	void updateContent(@Param("id") Integer id,@Param("content") String content);
 	
 	ClockinContent selectTodayClockinContent(Integer customerInfoId,Integer clockinLabelId);
 	

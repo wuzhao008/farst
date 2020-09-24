@@ -29,4 +29,7 @@ public class ClockinLogVo implements Serializable{
 	@ApiModelProperty(value = "评论数量", required = true)
 	private Long reviewCount;
 	
+    @ApiModelProperty(value = "当前用户是否点赞")
+    private Boolean isUp;
+	
 }

@@ -1,5 +1,8 @@
 package com.farst.clockin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.farst.clockin.entity.ClockinContentUp;
 import com.farst.clockin.entity.ClockinReview;
 import com.farst.clockin.mapper.ClockinReviewMapper;
 import com.farst.clockin.service.IClockinReviewService;
@@ -28,6 +31,21 @@ public class ClockinReviewServiceImpl extends BasicServiceImpl<ClockinReviewMapp
 	@Override
 	public List<Map<String, Object>> getMapReviewCountsByListContentId(List<Integer> listContentId) {
 		return this.clockinReviewMapper.selectMapReviewCountsByListContentId(listContentId);
+	}
+	
+	@Override
+	public Long getReviewCountByContentId(Integer clockinContentId) {
+		QueryWrapper<ClockinReview> queryWrapper = new QueryWrapper<ClockinReview>();
+		queryWrapper.eq("clockin_content_id", clockinContentId).eq("status", 0);
+		List<ClockinReview> list = this.list(queryWrapper);
+		return ((list == null) ? (long)0 : (long)list.size());
+	}
+
+	@Override
+	public IPage<ClockinReview> getPageClockinReviewByContentId(IPage<ClockinReview> page,Integer clockinContentId) {
+		QueryWrapper<ClockinReview> queryWrapper = new QueryWrapper<ClockinReview>();
+		queryWrapper.eq("clockin_content_id", clockinContentId).eq("status", 0).orderByDesc("id");
+		return this.page(page, queryWrapper); 
 	}
 
 }

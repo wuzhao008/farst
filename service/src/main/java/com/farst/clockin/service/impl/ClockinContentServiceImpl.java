@@ -38,10 +38,15 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	public IPage<TodayClockinVo> getPageTodayClockinVo(IPage<TodayClockinVo> page, Integer customerInfoId) {
 		return this.clockinContentMapper.selectPageTodayClockinVo(page, customerInfoId);
 	}
-	
+
 	@Override
 	public IPage<ClockinContent> getPageSimilarClockinContent(IPage<ClockinContent> page,Integer customerInfoId){
 		return this.clockinContentMapper.selectPageSimilarClockinContent(page, customerInfoId);
+	}
+	
+	@Override
+	public IPage<ClockinContent> getPageMyClockinContent(IPage<ClockinContent> page,Integer customerInfoId){
+		return this.clockinContentMapper.selectPageMyClockinContent(page, customerInfoId);
 	}
 	
 	@Override
@@ -117,6 +122,11 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 				}
 			}
 		}
+	}
+
+	@Override
+	public void updateContent(Integer id, String content) {
+		this.clockinContentMapper.updateContent(id, content);
 	}
 		
 }

@@ -150,8 +150,6 @@ public class ClockinContentController extends BasicController {
     	return response;
     }
     
-
-
     @ApiOperation(value = "发布打卡日志")
     @PostMapping(value = "/publishTodayClockinContent")
     public RestResponse<String> publishTodayClockinContent(@RequestHeader("tokenid") String tokenid,@RequestBody ClockinContentDto clockinContentDto){
@@ -178,6 +176,28 @@ public class ClockinContentController extends BasicController {
     	return response;
     }
     
+
+
+    @ApiOperation(value = "删除掉我的某条打卡日志")
+    @PostMapping(value = "/removeClockinContent")
+    public RestResponse<String> removeClockinContent(@RequestHeader("tokenid") String tokenid,@RequestParam(name="clockinContentId") Integer clockinContentId){
+    	RestResponse<String> response = new RestResponse<String>();
+    	try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		ClockinContent cc = this.clockinContentService.getById(clockinContentId);
+     		if(cc == null || cc.getStatus() != 0 || !cc.getCustomerInfoId().equals(custId)) {
+     			response.setErrorMsg("非法请求");
+     			return response;
+     		} 
+     		this.clockinContentService.updateContent(cc.getId(), null);
+     		response.setSuccess("删除打卡日志成功");
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    }
     
     /**
      * 查询同道中人的日志信息
@@ -205,7 +225,9 @@ public class ClockinContentController extends BasicController {
       		List<ClockinLabel> listLabel = null;
       		List<Map<String,Object>> listReviewCnt = null;
       		List<Map<String,Object>> listUpCnt = null;
-      				
+      		List<Integer> listCcupId = null;
+      		
+      		
       		if(CollectionUtils.isNotEmpty(listCc)) {
       			listCc.forEach(cc->{
       				listCcId.add(cc.getId());
@@ -217,6 +239,7 @@ public class ClockinContentController extends BasicController {
           		listLabel = this.clockinLabelService.getListClockinLabelByListId(listLabelId);
           		listReviewCnt = this.clockinReviewService.getMapReviewCountsByListContentId(listCcId);
           		listUpCnt = this.clockinContentUpService.getMapContentUpsByListContentId(listCcId);
+          		listCcupId = this.clockinContentUpService.getMyUpContentIds(listCcId, custId);
           		
       			for(ClockinContent cc : listCc) {
       				ClockinLogVo clVo = new ClockinLogVo();
@@ -276,6 +299,126 @@ public class ClockinContentController extends BasicController {
       						}
       					}
       				} 
+      				clVo.setIsUp(false);
+      				//构造当前用户是否顶过该日志
+      				if(CollectionUtils.isNotEmpty(listCcupId)) {
+      					if(listCcupId.contains(cc.getId())) {
+      						clVo.setIsUp(true);
+      					}
+      				} 
+      				
+      				listClVo.add(clVo);
+      			}
+      		}
+      		pageClVo.setRecords(listClVo);
+      		response.setSuccess(pageClVo);
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    }
+    
+
+    /**
+     * 查询我的日志列表信息
+     */
+    @ApiOperation(value = "查询我的日志列表信息")
+    @GetMapping(value = "/getPageMyClockinLog")
+    public RestResponse<IPage<ClockinLogVo>> getPageMyClockinLog(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,@RequestParam(name = "pageSize", defaultValue = "20") int pageSize){
+        RestResponse<IPage<ClockinLogVo>> response = new RestResponse<>();
+    	try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		CustomerInfo cust = this.customerInfoService.getById(custId);
+     		IPage<ClockinContent> pageCc = new Page<ClockinContent>(pageNum, pageSize);
+     		IPage<ClockinLogVo> pageClVo = new Page<ClockinLogVo>(pageNum, pageSize);
+     		pageCc = this.clockinContentService.getPageMyClockinContent(pageCc, custId);
+     		pageClVo.setPages(pageCc.getPages());
+     		pageClVo.setTotal(pageCc.getTotal());
+      		List<ClockinContent> listCc = pageCc.getRecords();
+      		List<ClockinLogVo> listClVo = new ArrayList<ClockinLogVo>();
+      		
+      		//为了减少数据库循环请求，一次性从数据库中根据列表内容ID获取对应的数据
+      		List<Integer> listCcId = new ArrayList<Integer>(); 
+      		List<Integer> listLabelId = new ArrayList<Integer>();
+      		List<ClockinPicture> listCp = null; 
+      		List<ClockinLabel> listLabel = null;
+      		List<Map<String,Object>> listReviewCnt = null;
+      		List<Map<String,Object>> listUpCnt = null;
+      		List<Integer> listCcupId = null;
+      		
+      		
+      		if(CollectionUtils.isNotEmpty(listCc)) {
+      			listCc.forEach(cc->{
+      				listCcId.add(cc.getId()); 
+      				listLabelId.add(cc.getClockinLabelId());
+      			});
+      			listCp = this.clockinPictureService.getAllClockinPictureByListContentId(listCcId); 
+          		listLabel = this.clockinLabelService.getListClockinLabelByListId(listLabelId);
+          		listReviewCnt = this.clockinReviewService.getMapReviewCountsByListContentId(listCcId);
+          		listUpCnt = this.clockinContentUpService.getMapContentUpsByListContentId(listCcId);
+          		listCcupId = this.clockinContentUpService.getMyUpContentIds(listCcId, custId);
+          		
+      			for(ClockinContent cc : listCc) {
+      				ClockinLogVo clVo = new ClockinLogVo();
+      				clVo.setReviewCount((long)0);
+      				clVo.setUpCount((long)0);
+      				
+      				//构造contentVo
+      				ClockinContentVo ccVo = new ClockinContentVo();
+      				ccVo.setClockinContent(cc);
+      				List<ClockinPicture> listCp_ = new ArrayList<ClockinPicture>();
+      				if(CollectionUtils.isNotEmpty(listCp)) {
+      					listCp.forEach(cp->{
+      						if(cp.getClockinContentId().equals(cc.getId())) {
+      							listCp_.add(cp);
+      						}
+      					});
+      				}
+      				ccVo.setClockinPictures(listCp_);
+      				clVo.setClockinContentVo(ccVo);
+      				
+      				//构造用户信息
+      				clVo.setCustomerInfo(cust);
+      				
+      				//构造习惯信息
+      				if(CollectionUtils.isNotEmpty(listLabel)) {
+      					for(ClockinLabel label : listLabel) {
+      						if(label.getId().equals(cc.getClockinLabelId())) {
+      							clVo.setClockinLabel(label);
+      							break;
+      						}
+      					}
+      				}
+      				
+      				//构造评论数
+      				if(CollectionUtils.isNotEmpty(listReviewCnt)) {
+      					for(Map<String, Object> mapCnt : listReviewCnt) {
+      						if(mapCnt.get("id").equals(cc.getId())) {
+      							clVo.setReviewCount((Long)mapCnt.get("cnt"));
+      							break;
+      						}
+      					}
+      				}
+      				
+      				//构造置顶数
+      				if(CollectionUtils.isNotEmpty(listUpCnt)) {
+      					for(Map<String, Object> mapCnt : listUpCnt) {
+      						if(mapCnt.get("id").equals(cc.getId())) {
+      							clVo.setUpCount((Long)mapCnt.get("cnt"));
+      							break;
+      						}
+      					}
+      				} 
+      				clVo.setIsUp(false);
+      				//构造当前用户是否顶过该日志
+      				if(CollectionUtils.isNotEmpty(listCcupId)) {
+      					if(listCcupId.contains(cc.getId())) {
+      						clVo.setIsUp(true);
+      					}
+      				}
+      				
       				listClVo.add(clVo);
       			}
       		}
@@ -290,5 +433,49 @@ public class ClockinContentController extends BasicController {
     }
     
     
+    /**
+     * 根据日志内容ID查询日志内容
+     */
+    @ApiOperation(value = "根据日志内容ID查询日志内容")
+    @GetMapping(value = "/getClockinLogById")
+    public RestResponse<ClockinLogVo> getClockinLogById(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "clockinContentId") Integer clockinContentId){
+        RestResponse<ClockinLogVo> response = new RestResponse<>();
+    	try {
+     		ClockinLogVo clVo = new ClockinLogVo();
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		CustomerInfo cust = this.customerInfoService.getById(custId);
+     		clVo.setCustomerInfo(cust);
+     		
+     		ClockinContentVo ccVo = new ClockinContentVo();
+     		ClockinContent cc = this.clockinContentService.getById(clockinContentId);
+     		if((cc == null || cc.getStatus() !=0 )) {
+     			response.setErrorMsg("非法请求");
+     			return response;
+     		}
+     		List<ClockinPicture> listCp = this.clockinPictureService.getAllClockinPictureByContentId(cc.getId());
+     		ccVo.setClockinContent(cc);
+     		ccVo.setClockinPictures(listCp);
+     		clVo.setClockinContentVo(ccVo);
+     		
+     		ClockinLabel cl = this.clockinLabelService.getById(cc.getClockinLabelId());
+     		clVo.setClockinLabel(cl);
+     		
+     		Long upCnt = this.clockinContentUpService.getUpCountByContentId(cc.getId());
+     		clVo.setUpCount(upCnt);
+     		
+     		Long reviewCnt = this.clockinReviewService.getReviewCountByContentId(cc.getId());
+     		clVo.setReviewCount(reviewCnt);
+     		
+     		boolean isUp = this.clockinContentUpService.hasUpClockinContent(clockinContentId, custId);
+     		clVo.setIsUp(isUp);
+     		
+     		response.setSuccess(clVo);
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    }
     
 }
