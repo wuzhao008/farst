@@ -1,6 +1,7 @@
 package com.farst.customer.service;
 
 import com.farst.customer.entity.CustomerInfo;
+import com.farst.customer.vo.CustomerInfoVo;
 import com.farst.customer.vo.TokenCustVo;
 
 import java.util.List;
@@ -42,5 +43,13 @@ public interface ICustomerInfoService extends IBasicService<CustomerInfo> {
 	 * @return
 	 */
 	public List<CustomerInfo> getListCustomerInfoBy(List<Integer> listCustId);
+	
+	/**
+	 * 根据用户ID得到相关的用户信息
+	 * 
+	 * @param custId
+	 * @return
+	 */
+	public CustomerInfoVo getCustomerInfoVoById(Integer custId);
 
 }

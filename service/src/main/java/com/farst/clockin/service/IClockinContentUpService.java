@@ -40,6 +40,14 @@ public interface IClockinContentUpService extends IBasicService<ClockinContentUp
 	public Long getUpCountByContentId(Integer clockinContentId);
 	
 	/**
+	 * 查询我的被赞总数
+	 * 
+	 * @param customerInfoId
+	 * @return
+	 */
+	public Integer getMyUpCount(Integer customerInfoId);
+	
+	/**
 	 * 查询当前用户是否点赞这个日志
 	 * 
 	 * @param clockinContentId

@@ -5,6 +5,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.farst.customer.service.ICustomerInfoService;
 import com.farst.customer.service.ICustomerLabelService;
+import com.farst.customer.vo.CustomerInfoVo;
 import com.farst.customer.vo.PhoneLoginVo;
 import com.farst.customer.vo.TokenCustVo;
 import com.farst.customer.vo.TokenInfoVo;
@@ -199,14 +200,15 @@ public class CustomerInfoController extends BasicController {
 	}
   
     /**
-     * 根据id查询
+     * 查询我的编辑信息
      */
-    @ApiOperation(value = "根据客户id查询客户信息")
-    @GetMapping(value = "/getById")
-    public RestResponse<CustomerInfo> getById(@RequestParam("id") Integer id){
+    @ApiOperation(value = "查询我的编辑信息")
+    @GetMapping(value = "/getMyCustomerInfo")
+    public RestResponse<CustomerInfo> getCustomerInfoById(@RequestHeader("tokenid") String tokenid){
       	 RestResponse<CustomerInfo> response = new RestResponse<>();
          try {
-            CustomerInfo customerInfo = this.customerInfoService.getById(id);
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+            CustomerInfo customerInfo = this.customerInfoService.getById(custId);
             response.setSuccess(customerInfo);
          } catch (Exception e) {
             e.printStackTrace();
@@ -215,6 +217,45 @@ public class CustomerInfoController extends BasicController {
          }
          return response;
     }
+    
+    /**
+     * 查询我的详细信息
+     */
+    @ApiOperation(value = "查询我的详细信息-顶部区域（含客户信息、统计和习惯标签）")
+    @GetMapping(value = "/getMyCustomerDetailInfo")
+    public RestResponse<CustomerInfoVo> getMyCustomerDetailInfo(@RequestHeader("tokenid") String tokenid){
+      	 RestResponse<CustomerInfoVo> response = new RestResponse<>();
+         try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+            CustomerInfoVo customerInfoVo = this.customerInfoService.getCustomerInfoVoById(custId);
+            response.setSuccess(customerInfoVo);
+         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+         }
+         return response;
+    }
+    
+    /**
+     * 根据客户ID查询对应详细信息
+     */
+    @ApiOperation(value = "根据客户ID查询对应详细信息-顶部区域（含客户信息、统计和习惯标签）")
+    @GetMapping(value = "/getCustomerDetailInfoById")
+    public RestResponse<CustomerInfoVo> getCustomerDetailInfoById(@RequestParam(value = "customerInfoId") Integer customerInfoId){
+      	 RestResponse<CustomerInfoVo> response = new RestResponse<>();
+         try { 
+            CustomerInfoVo customerInfoVo = this.customerInfoService.getCustomerInfoVoById(customerInfoId);
+            response.setSuccess(customerInfoVo);
+         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+         }
+         return response;
+    }
+    
+    
     
     @ApiOperation(value = "设置昵称")
     @PostMapping(value = "/editNickName")

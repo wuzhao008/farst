@@ -45,7 +45,13 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 */
 	public IPage<ClockinContent> getPageMyClockinContent(IPage<ClockinContent> page,Integer customerInfoId);
 	
-	
+	/**
+	 * 得到用户发布的日志总数
+	 * 
+	 * @param customerInfoId
+	 * @return
+	 */
+	public Integer getCountClockinContent(Integer customerInfoId);
 	
 	/**
 	 * 得到当天用户对应习惯的打卡内容

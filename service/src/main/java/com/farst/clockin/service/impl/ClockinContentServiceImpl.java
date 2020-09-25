@@ -1,5 +1,6 @@
 package com.farst.clockin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.farst.clockin.entity.ClockinContent;
 import com.farst.clockin.entity.ClockinPicture;
@@ -48,6 +49,15 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	public IPage<ClockinContent> getPageMyClockinContent(IPage<ClockinContent> page,Integer customerInfoId){
 		return this.clockinContentMapper.selectPageMyClockinContent(page, customerInfoId);
 	}
+
+
+	@Override
+	public Integer getCountClockinContent(Integer customerInfoId) {
+		QueryWrapper<ClockinContent> queryWrapper = new QueryWrapper<ClockinContent>();
+		queryWrapper.eq("customer_info_id", customerInfoId).eq("check_status", 1).eq("status", 0);
+		return this.count(queryWrapper);
+	}
+	
 	
 	@Override
 	public ClockinContent getTodayClockinContent(Integer customerInfoId, Integer labelId) {

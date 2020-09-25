@@ -29,5 +29,15 @@
 			   and `status` = 0
 			group by `clockin_content_id`
 	</select>
+	
+	<select id="selectMyUpCount" resultType="java.lang.Integer">
+		select count(distinct a.id) as cnt
+		  from clockin_content_up a
+		  join clockin_content b
+		    on a.clockin_content_id = b.id
+		 where a.status = 0
+		   and b.status = 0
+		   and b.customer_info_id = #{customerInfoId}
+	</select>
 
 </mapper>

@@ -37,6 +37,20 @@ public class CustomerFollowServiceImpl extends BasicServiceImpl<CustomerFollowMa
 	}
 
 	@Override
+	public Integer getCountMyFollow(Integer customerInfoId) {
+		QueryWrapper<CustomerFollow> queryWrapper = new QueryWrapper<CustomerFollow>();
+		queryWrapper.eq("customer_info_id", customerInfoId).eq("status", 0);
+		return this.count(queryWrapper);
+	}
+	
+	@Override
+	public Integer getCountMyFans(Integer customerInfoId) {
+		QueryWrapper<CustomerFollow> queryWrapper = new QueryWrapper<CustomerFollow>();
+		queryWrapper.eq("follow_customer_info_id", customerInfoId).eq("status", 0);
+		return this.count(queryWrapper);
+	}
+	
+	@Override
 	public CustomerFollow getCustomerFollowRecord(Integer customerInfoId, Integer followCustomerInfoId) {
 		QueryWrapper<CustomerFollow> queryWrapper = new QueryWrapper<CustomerFollow>();
 		queryWrapper.eq("customer_info_id", customerInfoId).eq("follow_customer_info_id", followCustomerInfoId);

@@ -20,4 +20,6 @@ public interface ClockinContentUpMapper extends BasicMapper<ClockinContentUp> {
 	
 	List<Map<String, Object>> selectMapContentUpsByListContentId(@RequestParam("listContentId") List<Integer> listContentId);
 	
+	public Integer selectMyUpCount(Integer customerInfoId);
+	
 }

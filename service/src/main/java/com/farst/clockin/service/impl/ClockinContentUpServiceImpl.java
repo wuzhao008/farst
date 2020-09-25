@@ -54,6 +54,11 @@ public class ClockinContentUpServiceImpl extends BasicServiceImpl<ClockinContent
 		List<ClockinContentUp> list = this.list(queryWrapper);
 		return ((list == null) ? (long)0 : (long)list.size());
 	}
+	
+	@Override
+	public Integer getMyUpCount(Integer customerInfoId) {
+		return this.clockinContentUpMapper.selectMyUpCount(customerInfoId);
+	}
 
 	@Override
 	public ClockinContentUp getClockinContentRecord(Integer customerInfoId, Integer clockinContentId) {

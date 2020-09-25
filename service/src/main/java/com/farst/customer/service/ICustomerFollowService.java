@@ -21,6 +21,15 @@ public interface ICustomerFollowService extends IBasicService<CustomerFollow> {
 	 * @return
 	 */
 	public IPage<CustomerInfo> getPageMyFollow(IPage<CustomerInfo> page,Integer customerInfoId);
+	
+	/**
+	 * 得到关注的人总数
+	 * 
+	 * @param customerInfoId
+	 * @return
+	 */
+	public Integer getCountMyFollow(Integer customerInfoId);
+	
 	/**
 	 * 得到用户的粉丝分页信息
 	 * 
@@ -28,6 +37,14 @@ public interface ICustomerFollowService extends IBasicService<CustomerFollow> {
 	 * @return
 	 */
 	public IPage<CustomerInfo> getPageMyFans(IPage<CustomerInfo> page,Integer customerInfoId);
+
+	/**
+	 * 得到粉丝总数
+	 * 
+	 * @param customerInfoId
+	 * @return
+	 */
+	public Integer getCountMyFans(Integer customerInfoId);
 
 	/**
 	 * 根据用户ID和关注的用户ID获的关注记录
