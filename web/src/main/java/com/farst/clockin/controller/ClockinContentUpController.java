@@ -4,8 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.farst.clockin.entity.ClockinContent;
-import com.farst.clockin.entity.ClockinContentUp;
-import com.farst.clockin.entity.ClockinReview;
+import com.farst.clockin.entity.ClockinContentUp; 
 import com.farst.clockin.service.IClockinContentService;
 import com.farst.clockin.service.IClockinContentUpService;  
 import io.swagger.annotations.Api;
@@ -53,6 +52,7 @@ public class ClockinContentUpController extends BasicController {
         	ClockinContent cc = this.clockinContentService.getById(clockinContentId);
         	if(cc == null || cc.getStatus() != 0) {
         		response.setErrorMsg("非法请求");
+        		return response;
         	}
         	ClockinContentUp ccup = this.clockinContentUpService.getClockinContentRecord(custId, clockinContentId);
         	if(ccup == null) {
@@ -84,6 +84,7 @@ public class ClockinContentUpController extends BasicController {
         	ClockinContent cc = this.clockinContentService.getById(clockinContentId);
         	if(cc == null || cc.getStatus() != 0) {
         		response.setErrorMsg("非法请求");
+        		return response;
         	}
         	ClockinContentUp ccup = this.clockinContentUpService.getClockinContentRecord(custId, clockinContentId);
         	if(ccup != null) {

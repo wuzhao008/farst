@@ -1,7 +1,6 @@
 package com.farst.clockin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.farst.clockin.entity.ClockinContentUp;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper; 
 import com.farst.clockin.entity.ClockinReviewUp;
 import com.farst.clockin.mapper.ClockinReviewUpMapper;
 import com.farst.clockin.service.IClockinReviewUpService;
@@ -46,5 +45,12 @@ public class ClockinReviewUpServiceImpl extends BasicServiceImpl<ClockinReviewUp
 			});
 		}
 		return listCrupId;
+	}
+
+	@Override
+	public ClockinReviewUp getClockinReviewRecord(Integer customerInfoId, Integer clockinReviewId) {
+		QueryWrapper<ClockinReviewUp> queryWrapper = new QueryWrapper<ClockinReviewUp>();
+		queryWrapper.eq("customer_info_id", customerInfoId).eq("clockin_review_id", clockinReviewId);
+		return this.getOne(queryWrapper);
 	}
 }

@@ -1,6 +1,7 @@
 package com.farst.clockin.entity;
+ 
+import java.util.Date;
 
-import java.time.LocalDateTime;
 import com.farst.common.entity.BasicEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,10 +33,10 @@ public class ClockinReviewUp extends BasicEntity {
     private Integer status;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createDate;
+    private Date createDate;
 
     @ApiModelProperty(value = "最近修改时间")
-    private LocalDateTime lastEditTime;
+    private Date lastEditTime;
 
 
 }

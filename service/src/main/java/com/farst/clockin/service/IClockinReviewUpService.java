@@ -2,7 +2,7 @@ package com.farst.clockin.service;
 
 import java.util.List;
 import java.util.Map;
-
+ 
 import com.farst.clockin.entity.ClockinReviewUp;
 import com.farst.common.service.IBasicService;
 
@@ -32,4 +32,15 @@ public interface IClockinReviewUpService extends IBasicService<ClockinReviewUp> 
 	 * @return
 	 */
 	public List<Integer> getMyUpReviewIds(List<Integer> listReviewId,Integer customerInfoId);
+	
+
+	
+	/**
+	 * 根据用户ID和评论ID得到点赞记录
+	 * 
+	 * @param customerInfoId
+	 * @param clockinReviewId
+	 * @return
+	 */
+	public ClockinReviewUp getClockinReviewRecord(Integer customerInfoId,Integer clockinReviewId);
 }
