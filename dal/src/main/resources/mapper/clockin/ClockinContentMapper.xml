@@ -69,7 +69,7 @@
 			   		)
 			   end 
 			   ) as statistics_clockin_days
-		 from (select * from `clockin_setting` where month &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d') order by month desc limit 1)a
+		 from (select * from `clockin_setting` where freq_start_date &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d') order by freq_start_date desc limit 1)a
 		join `customer_label` b 
 		on a.`customer_label_id` = b.id 
 		join `clockin_label` c 

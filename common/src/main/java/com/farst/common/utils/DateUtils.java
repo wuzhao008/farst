@@ -19,6 +19,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -165,6 +166,50 @@ public class DateUtils {
         }
         return cal.getTime();
     }
+    
+    /**
+     * 获取本周的第一天
+     * @return String
+     * **/
+    public static Date getWeekStart(){
+        Calendar cal=Calendar.getInstance();
+        cal.add(Calendar.WEEK_OF_MONTH, 0);
+        cal.set(Calendar.DAY_OF_WEEK, 2);
+        Date time=cal.getTime();
+        return time;
+    }
+    
+    /**
+     * 获取本年第一天
+     * @return
+     */
+    public static Date getCurrYearFirst(){
+		Calendar currCal=Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance();
+		calendar.clear();
+		calendar.set(Calendar.YEAR,currCal.get(Calendar.YEAR));
+		Date time = calendar.getTime();
+		return time;
+	}
+
+
+    /**
+     * 获取明年第一天
+     * @return
+     */
+    public static Date getNextYearFirst(){
+    	 Calendar curr = Calendar.getInstance();
+    	  curr.setTime(new Date());//使用给定的 enDate 设置此 Calendar 的时间
+    	  curr.set(Calendar.YEAR,curr.get(Calendar.YEAR)+1);//得到下一年
+    	  Date date=curr.getTime();
+    	  GregorianCalendar gc = (GregorianCalendar) Calendar.getInstance();
+    	  gc.setTime(date);
+    	  gc.get(Calendar.YEAR);
+    	  gc.set(gc.get(Calendar.YEAR), 0, 1);//设置下一年第一天
+    	  return gc.getTime();
+	}
+
+    
     
     /**
      * 两个时间之间的天数
@@ -398,11 +443,34 @@ public class DateUtils {
 		return week;
 	}
 	
+	/**
+     * 获得入参日期下周一的日期
+     *
+     * @param date 入参日期
+     * @return 入参日期的下周一
+     */
+    public static Date getNextMonday(Date date) {
+        //获得入参的日期
+        Calendar cd = Calendar.getInstance();
+        cd.setTime(date);
+        int dayOfWeek = cd.get(Calendar.DAY_OF_WEEK);
+        int nextMondayOffset = dayOfWeek == 1 ? 1 : 9 - dayOfWeek; 
+        cd.add(Calendar.DAY_OF_MONTH, nextMondayOffset);
+        return cd.getTime();
+    }
 	
 	public static void main(String[] args) {
+		System.out.println(getWeekStart());
+		System.out.println(getNextMonday(new Date()));
+
+		System.out.println(getCurrYearFirst());
+		System.out.println(getNextYearFirst());
+		
+		/**
 		System.out.println(getWeek2(toDate("2020-02-23",DATE_PATTERN)));		
 		System.out.println(DateUtils.DatetoString(DateUtils.toDate("2020-02-23","MM.dd"),"MM.dd"));
 		System.out.println(DateUtils.DatetoString(DateUtils.toDate("2020-02-24","MM.dd"),"MM.dd"));
+		**/
 	}
 
 }

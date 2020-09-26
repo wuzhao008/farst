@@ -61,14 +61,21 @@ public class ClockinSettingController extends BasicController {
         	}
         	 
      		ClockinSetting cs = this.clockinSettingService.getLatestClockingSettingBy(clockinSettingDto.getCustomerLabelId());
-     		//当前没有设置规则，则设置当月及以后规则；
+     		//当前没有设置规则，则设置当前周期及以后规则；
      		if(cs == null) {
      			cs = new ClockinSetting();
-     			Date month = DateUtils.getSpecialDate(new Date(), 3);
+     			Date curFreqDateStart = null;
+     			if(clockinSettingDto.getFreqType().intValue() == 1 ) {
+     				curFreqDateStart = DateUtils.getWeekStart();
+     			}else if(clockinSettingDto.getFreqType().intValue() == 2) {
+     				curFreqDateStart = DateUtils.getSpecialDate(new Date(), 3);
+     			}else if(clockinSettingDto.getFreqType().intValue() == 3) {
+     				curFreqDateStart = DateUtils.getCurrYearFirst();
+     			}
      			BeanUtils.copyProperties(clockinSettingDto, cs);
      			cs.setCreateDate(new Date());
      			cs.setCustomerLabelId(clockinSettingDto.getCustomerLabelId());
-     			cs.setMonth(month);
+     			cs.setFreqStartDate(curFreqDateStart);
      			cs.setStatus(0);
      			this.clockinSettingService.save(cs);
                 response.setSuccess("习惯规则设置成功");
@@ -81,11 +88,18 @@ public class ClockinSettingController extends BasicController {
      				return response;
      			}
      			
-     			String strMonth = DateUtils.DatetoString(cs.getMonth(), "yyyy-MM-dd");
-     			Date dateNextMonth = DateUtils.addTime(DateUtils.getSpecialDate(new Date(), 3), 2,1);
-     			String strNextMonth = DateUtils.DatetoString(dateNextMonth, "yyyy-MM-dd");
+     			String strCurFreqStartDate = DateUtils.DatetoString(cs.getFreqStartDate(), "yyyy-MM-dd");
+     			Date dateNextFreqStartDate = null;
+     			if(cs.getFreqType().intValue() == 1 ) {
+     				dateNextFreqStartDate = DateUtils.getNextMonday(new Date());
+     			}else if(cs.getFreqType().intValue() == 2) {
+     				dateNextFreqStartDate = DateUtils.addTime(DateUtils.getSpecialDate(new Date(), 3), 2,1);
+     			}else if(cs.getFreqType().intValue() == 3) {
+     				dateNextFreqStartDate = DateUtils.getNextYearFirst();
+     			} 
+     			String strNextFreqStartDate = DateUtils.DatetoString(dateNextFreqStartDate, "yyyy-MM-dd");
      			//如果最新规则日期是下一月的，则直接更新
-     			if(strMonth.equals(strNextMonth)) {
+     			if(strCurFreqStartDate.equals(strNextFreqStartDate)) {
      				if(clockinSettingDto.getFreqType().equals(cs.getFreqType()) == false) {
      					response.setErrorMsg("习惯规则类型不能更改，如想修改，请先删除后重新维护");
      					return response;
@@ -94,13 +108,12 @@ public class ClockinSettingController extends BasicController {
      				if(cs.getPopupLog().equals(clockinSettingDto.getPopupLog()) == false) {
      					this.clockinSettingService.updateLatestPopupLog(clockinSettingDto.getCustomerLabelId(), clockinSettingDto.getPopupLog());
      				}
-     				
      				BeanUtils.copyProperties(clockinSettingDto, cs);
      				this.clockinSettingService.saveOrUpdate(cs);
      				response.setSuccess("新规则设置成功，将在下一个周期生效");
      			}
-     			//如果下一月还没有设置规则，则新增下一月规则
-     			else if(strNextMonth.compareTo(strMonth)>0){
+     			//如果下一个周期还没有设置规则，则新增下一个周期规则
+     			else if(strNextFreqStartDate.compareTo(strCurFreqStartDate)>0){
      				if(clockinSettingDto.getFreqType().equals(cs.getFreqType()) == false) {
      					response.setErrorMsg("习惯规则类型不能更改，如想修改，请先删除后重新维护");
      					return response;
@@ -113,7 +126,7 @@ public class ClockinSettingController extends BasicController {
          			BeanUtils.copyProperties(clockinSettingDto, cs);
          			cs.setCreateDate(new Date());
          			cs.setCustomerLabelId(clockinSettingDto.getCustomerLabelId());
-         			cs.setMonth(dateNextMonth);
+         			cs.setFreqStartDate(dateNextFreqStartDate);
          			cs.setStatus(0);
          			this.clockinSettingService.save(cs);
      				response.setSuccess("新规则设置成功，将在下一个周期生效");

@@ -37,8 +37,8 @@ public class ClockinSetting extends BasicEntity {
     @ApiModelProperty(value = "是否自动弹出写日志")
     private Integer popupLog;
 
-    @ApiModelProperty(value = "设置的对应月份，当没有记录时设置为当前月份，有当前月份记录时设置下月月份，有下月记录时，则不能设置")
-    private Date month;
+    @ApiModelProperty(value = "设置的对应周期开始日期")
+    private Date freqStartDate;
 
     @ApiModelProperty(value = "正常删除状态(0正常,1为删除)")
     private Integer status;

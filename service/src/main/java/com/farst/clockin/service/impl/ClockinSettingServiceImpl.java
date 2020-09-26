@@ -28,7 +28,7 @@ public class ClockinSettingServiceImpl extends BasicServiceImpl<ClockinSettingMa
 		QueryWrapper<ClockinSetting> queryWrapper = new QueryWrapper<ClockinSetting>();
 		queryWrapper.eq("status", 0)
 					.eq("customer_label_id", customerLabelId)
-					.orderByDesc("month");
+					.orderByDesc("freq_start_date");
 		List<ClockinSetting> listCs = this.list(queryWrapper);
 		return CollectionUtils.isEmpty(listCs) ? null : listCs.get(0);
 		
