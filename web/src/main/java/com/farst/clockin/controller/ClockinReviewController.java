@@ -5,25 +5,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.farst.clockin.service.IClockinContentService;
 import com.farst.clockin.service.IClockinReviewService;
-import com.farst.clockin.dto.ClockinContentDto;
+import com.farst.clockin.service.IClockinReviewUpService; 
+import com.farst.clockin.vo.ClockinReviewVo; 
 import com.farst.clockin.dto.ClockinReviewDto;
 import com.farst.clockin.entity.ClockinContent;
 import com.farst.clockin.entity.ClockinReview;
 import com.farst.common.web.response.RestResponse;
+import com.farst.customer.entity.CustomerInfo;
 import com.farst.customer.service.ICustomerInfoService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.ArrayList; 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections.CollectionUtils; 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.slf4j.LoggerFactory; 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.farst.common.web.controller.BasicController;
@@ -45,6 +46,9 @@ public class ClockinReviewController extends BasicController {
     
     @Autowired
     private IClockinReviewService clockinReviewService;
+    
+    @Autowired
+    private IClockinReviewUpService clockinReviewUpService;
  	
     @Autowired
     private IClockinContentService clockinContentService;
@@ -57,12 +61,75 @@ public class ClockinReviewController extends BasicController {
      */
     @ApiOperation(value = "查询日志内容对应的分页评论信息")
     @GetMapping(value = "/getPageReviewByContentId")
-    public RestResponse<IPage<ClockinReview>> getPageReviewByContentId(@RequestParam(name="clockinContentId") Integer clockinContentId,@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,@RequestParam(name = "pageSize", defaultValue = "20") int pageSize){
-        RestResponse<IPage<ClockinReview>> response = new RestResponse<>();
-    	IPage<ClockinReview> page = new Page<ClockinReview>(pageNum, pageSize);
-    	try {
-	    	page = this.clockinReviewService.getPageClockinReviewByContentId(page, clockinContentId);
-	    	response.setSuccess(page);
+    public RestResponse<IPage<ClockinReviewVo>> getPageReviewByContentId(@RequestHeader("tokenid") String tokenid,@RequestParam(name="clockinContentId") Integer clockinContentId,@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,@RequestParam(name = "pageSize", defaultValue = "20") int pageSize){
+        RestResponse<IPage<ClockinReviewVo>> response = new RestResponse<>(); 
+    	try { 
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		IPage<ClockinReview> pageCr = new Page<ClockinReview>(pageNum, pageSize);
+     		IPage<ClockinReviewVo> pageCrVo = new Page<ClockinReviewVo>(pageNum, pageSize);
+     		pageCr = this.clockinReviewService.getPageClockinReviewByContentId(pageCr, clockinContentId);
+     		pageCrVo.setPages(pageCr.getPages());
+     		pageCrVo.setTotal(pageCr.getTotal());
+      		List<ClockinReview> listCr = pageCr.getRecords();
+      		List<ClockinReviewVo> listCrVo = new ArrayList<ClockinReviewVo>();
+      		
+      		//为了减少数据库循环请求，一次性从数据库中根据列表内容ID获取对应的数据
+      		List<Integer> listCustId = new ArrayList<Integer>();
+      		List<Integer> listReviewId = new ArrayList<Integer>();
+      		
+      		List<Map<String,Object>> listUpCnt = null;
+      		List<CustomerInfo> listCust = null;
+      		List<Integer> listCrupId = null;
+      		
+      		if(CollectionUtils.isNotEmpty(listCr)) {
+	  			listCr.forEach(cr->{ 
+	  				listCustId.add(cr.getCustomerInfoId()); 
+	  				listReviewId.add(cr.getId());
+	  			});
+	      		
+	  			listCust = this.customerInfoService.getListCustomerInfoBy(listCustId);
+	  			listUpCnt = this.clockinReviewUpService.getMapReviewUpsByListReviewId(listReviewId);
+          		listCrupId = this.clockinReviewUpService.getMyUpReviewIds(listReviewId, custId);
+	     		
+	  			for(ClockinReview cr : listCr) {
+	  				ClockinReviewVo crVo = new ClockinReviewVo();
+	  				crVo.setUpCount((long)0);
+	  				
+	  				crVo.setClockinReview(cr);
+	  				 
+	  				//构造用户信息
+	  				if(CollectionUtils.isNotEmpty(listCust)) {
+	  					for(CustomerInfo cust : listCust) {
+	  						if(cust.getId().equals(cr.getCustomerInfoId())) {
+	  							crVo.setCustomerInfo(cust);
+	  							break;
+	  						}
+	  					}
+	  				}
+	
+	  				//构造置顶数
+	  				if(CollectionUtils.isNotEmpty(listUpCnt)) {
+	  					for(Map<String, Object> mapCnt : listUpCnt) {
+	  						if(mapCnt.get("id").equals(cr.getId())) {
+	  							crVo.setUpCount((Long)mapCnt.get("cnt"));
+	  							break;
+	  						}
+	  					}
+	  				} 
+	  				crVo.setIsUp(false);
+	  				//构造当前用户是否顶过该日志
+	  				if(CollectionUtils.isNotEmpty(listCrupId)) {
+	  					if(listCrupId.contains(cr.getId())) {
+	  						crVo.setIsUp(true);
+	  					}
+	  				} 
+	  				
+	  				listCrVo.add(crVo);
+	  				
+	  			}
+      		}
+      		pageCrVo.setRecords(listCrVo);
+      		response.setSuccess(pageCrVo);
     	}catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

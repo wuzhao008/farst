@@ -17,5 +17,17 @@
         id,
         customer_info_id, clockin_review_id, status, create_date, last_edit_time
     </sql>
-
+	
+	<!-- 根据评论id列表得到对应的点赞数列表 -->
+	<select id="selectMapReviewUpsByListReviewId" resultType="java.util.Map">
+		    select `clockin_review_id` as id,count(id) as cnt 
+			  from `clockin_review_up`
+			 where `clockin_review_id` in
+			 <foreach item="reviewId" collection="list" separator="," open="(" close=")" index="">
+		     		#{reviewId, jdbcType=NUMERIC}
+		     </foreach>
+			   and `status` = 0
+			group by `clockin_review_id`
+	</select>
+	
 </mapper>

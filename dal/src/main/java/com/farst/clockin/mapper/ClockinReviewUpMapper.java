@@ -1,5 +1,10 @@
 package com.farst.clockin.mapper;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.farst.clockin.entity.ClockinReviewUp;
 import com.farst.common.mybatis.mapper.BasicMapper;
 
@@ -13,4 +18,6 @@ import com.farst.common.mybatis.mapper.BasicMapper;
  */
 public interface ClockinReviewUpMapper extends BasicMapper<ClockinReviewUp> {
 
+	List<Map<String, Object>> selectMapReviewUpsByListReviewId(@RequestParam("listReviewId") List<Integer> listReviewId);
+	
 }
