@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.farst.customer.mapper.CustomerMessageMapper">
+<mapper namespace="com.farst.customer.mapper.CustomerSuggestMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.farst.customer.entity.CustomerMessage">
+    <resultMap id="BaseResultMap" type="com.farst.customer.entity.CustomerSuggest">
         <result column="id" property="id" />
         <result column="customer_info_id" property="customerInfoId" />
-        <result column="message_type" property="messageType" />
         <result column="content" property="content" />
-        <result column="object_id" property="objectId" />
-        <result column="object_content" property="objectContent" />
-        <result column="read_status" property="readStatus" />
         <result column="status" property="status" />
         <result column="create_date" property="createDate" />
         <result column="last_edit_time" property="lastEditTime" />
@@ -19,7 +15,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        customer_info_id, message_type, content, object_id, object_content, read_status,status, create_date, last_edit_time
+        customer_info_id, content, status, create_date, last_edit_time
     </sql>
 
 </mapper>
