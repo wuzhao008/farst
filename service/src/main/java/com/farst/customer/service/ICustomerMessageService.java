@@ -36,4 +36,11 @@ public interface ICustomerMessageService extends IBasicService<CustomerMessage> 
 	 * @param customerInfoId
 	 */
 	void updateAllMessageToRead(Integer customerInfoId);
+	
+	/**
+	 * 删除所有我的消息
+	 * 
+	 * @param customerInfoId
+	 */
+	void deleteAllMessage(Integer customerInfoId);
 }

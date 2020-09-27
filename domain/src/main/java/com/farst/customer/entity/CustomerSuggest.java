@@ -28,12 +28,21 @@ public class CustomerSuggest extends BasicEntity {
 
     @ApiModelProperty(value = "建议内容")
     private String content;
+    
+    @ApiModelProperty(value = "回复内容")
+    private String reply;
 
+    @ApiModelProperty(value = "操作状态")
+    private Integer operStatus;
+    
     @ApiModelProperty(value = "状态")
     private Integer status;
 
     @ApiModelProperty(value = "创建时间")
     private Date createDate;
+
+    @ApiModelProperty(value = "回复时间")
+    private Date replyDate;
 
     @ApiModelProperty(value = "最近修改时间")
     private Date lastEditTime;

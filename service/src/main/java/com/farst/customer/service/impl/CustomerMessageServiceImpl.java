@@ -46,4 +46,13 @@ public class CustomerMessageServiceImpl extends BasicServiceImpl<CustomerMessage
 		this.update(updateWrapper);
 	}
 
+	@Override
+	public void deleteAllMessage(Integer customerInfoId) { 
+		UpdateWrapper<CustomerMessage> updateWrapper = new UpdateWrapper<CustomerMessage>();
+		updateWrapper.eq("customer_info_id", customerInfoId).eq("status", 0);
+		updateWrapper.set("status", 1);
+		updateWrapper.set("last_edit_time", new Date());
+		this.update(updateWrapper); 
+	}
+
 }

@@ -9,15 +9,10 @@ import com.farst.customer.entity.CustomerMessage;
 import com.farst.common.web.response.RestResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
+ 
+import java.util.Date; 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.slf4j.LoggerFactory; 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.farst.common.web.controller.BasicController;
@@ -53,7 +48,7 @@ public class CustomerMessageController extends BasicController {
     	try {
      		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
 	    	page = this.customerMessageService.getPageMyMessage(page, custId);
-	    	response.setData(page);
+	    	response.setSuccess(page);
     	}catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -97,6 +92,21 @@ public class CustomerMessageController extends BasicController {
     		customerMessage.setLastEditTime(new Date());
     		this.customerMessageService.saveOrUpdate(customerMessage);
     		response.setSuccess("删除成功");
+    	}catch(Exception e) {
+    		response.setErrorMsg(e.getMessage());
+    	}
+    	return response;
+    }
+    
+
+    @ApiOperation(value = "清空消息")
+    @PostMapping(value = "/deleteAllMessage")
+    public RestResponse<String> deleteAllMessage(@RequestHeader("tokenid") String tokenid){
+    	RestResponse<String> response = new RestResponse<>();
+    	try {
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId(); 
+    		this.customerMessageService.deleteAllMessage(custId);
+    		response.setSuccess("清空消息成功");
     	}catch(Exception e) {
     		response.setErrorMsg(e.getMessage());
     	}
