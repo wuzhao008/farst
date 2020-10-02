@@ -1,7 +1,5 @@
 package com.farst.clockin.entity;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+ 
 import java.util.Date;
 
 import com.farst.common.entity.BasicEntity;

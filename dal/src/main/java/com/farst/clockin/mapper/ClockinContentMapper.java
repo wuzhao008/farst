@@ -1,9 +1,12 @@
 package com.farst.clockin.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.farst.clockin.entity.ClockinContent;
+import com.farst.clockin.vo.ClockinTrendStatisticsVo;
 import com.farst.clockin.vo.TodayClockinVo;
 import com.farst.common.mybatis.mapper.BasicMapper; 
 
@@ -25,6 +28,12 @@ public interface ClockinContentMapper extends BasicMapper<ClockinContent> {
 	
 	void updateContent(@Param("id") Integer id,@Param("content") String content);
 	
-	ClockinContent selectTodayClockinContent(Integer customerInfoId,Integer clockinLabelId);
+	ClockinContent selectTodayClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("clockinLabelId") Integer clockinLabelId);
+	
+	List<ClockinContent> selectCurMonthListClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("clockinLabelId") Integer clockinLabelId);
+	
+	List<ClockinContent> selectMonthListClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("clockinLabelId") Integer clockinLabelId,@Param("month") String month);
+	
+	List<ClockinTrendStatisticsVo> selectListClockinTrendStatisticsVo(@Param("customerInfoId") Integer customerInfoId,@Param("customerLabelId") Integer customerLabelId,@Param("clockinLabelId") Integer clockinLabelId,@Param("type") Integer type);
 	
 }

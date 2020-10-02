@@ -3,7 +3,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.farst.clockin.entity.ClockinContent;
-import com.farst.clockin.vo.ClockinContentVo;
+import com.farst.clockin.vo.ClockinContentVo; 
+import com.farst.clockin.vo.ClockinTrendStatisticsVo;
 import com.farst.clockin.vo.TodayClockinVo;
 import com.farst.common.service.IBasicService; 
 
@@ -61,6 +62,33 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @return
 	 */
 	public ClockinContent getTodayClockinContent(Integer customerInfoId,Integer labelId);
+	
+	/**
+	 * 查询当月用户对应习惯打卡内容列表
+	 * 
+	 * @param customerInfoId
+	 * @param labelId
+	 * @return
+	 */
+	public List<ClockinContent> getCurMonthListClockinContent(Integer customerInfoId,Integer labelId);
+	
+	/**
+	 * 查询用户对应习惯对应月份的打卡内容列表
+	 * @param customerInfoId
+	 * @param month
+	 * @return
+	 */
+	public List<ClockinContent> getMonthListClockinContent(Integer customerInfoId,Integer labelId,String month);
+	
+	/**
+	 * 查询用户对应习惯的趋势统计记录
+	 * @param customerInfoId
+	 * @param customerLabelId
+	 * @param labelId
+	 * @param type
+	 * @return
+	 */
+	public List<ClockinTrendStatisticsVo> getListClockinTrendStatisticsVo(Integer customerInfoId,Integer customerLabelId,Integer labelId,Integer type);
 	
 	/**
 	 * 得到当天用户对应习惯打卡内容VO（含图片url）

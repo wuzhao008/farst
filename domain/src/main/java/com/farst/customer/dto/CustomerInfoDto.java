@@ -1,14 +1,9 @@
 package com.farst.customer.dto;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
-
-import com.farst.common.entity.BasicEntity;
+import java.time.LocalDate;  
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Data; 
 
 /**
  * <p>
@@ -21,8 +16,6 @@ import lombok.EqualsAndHashCode;
 @Data 
 @ApiModel(value="CustomerInfo对象dto", description="用户信息dto")
 public class CustomerInfoDto {
-
-    private static final long serialVersionUID = 1L; 
 
     @ApiModelProperty(value = "头像地址")
     private String avatarUrl; 

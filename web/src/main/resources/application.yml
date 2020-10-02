@@ -8,6 +8,9 @@ spring:
     password: rootroot
     url: jdbc:mysql://47.106.249.248:3306/farst-test?useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
     
   redis:
     host: 39.108.165.241

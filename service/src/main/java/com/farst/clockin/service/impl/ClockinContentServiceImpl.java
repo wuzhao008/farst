@@ -7,7 +7,8 @@ import com.farst.clockin.entity.ClockinPicture;
 import com.farst.clockin.mapper.ClockinContentMapper;
 import com.farst.clockin.service.IClockinContentService;
 import com.farst.clockin.service.IClockinPictureService;
-import com.farst.clockin.vo.ClockinContentVo;
+import com.farst.clockin.vo.ClockinContentVo; 
+import com.farst.clockin.vo.ClockinTrendStatisticsVo;
 import com.farst.clockin.vo.TodayClockinVo;
 import com.farst.common.service.impl.BasicServiceImpl;
 
@@ -64,6 +65,27 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 		return this.clockinContentMapper.selectTodayClockinContent(customerInfoId, labelId);
 	}
 
+	@Override
+	public List<ClockinContent> getCurMonthListClockinContent(Integer customerInfoId,Integer labelId){
+		return this.clockinContentMapper.selectCurMonthListClockinContent(customerInfoId, labelId);
+	}
+
+	@Override
+	public List<ClockinTrendStatisticsVo> getListClockinTrendStatisticsVo(Integer customerInfoId,Integer customerLabelId,Integer labelId,Integer type){
+		return this.clockinContentMapper.selectListClockinTrendStatisticsVo(customerInfoId, customerLabelId, labelId,type);
+	}
+
+	@Override
+	public List<ClockinContent> getMonthListClockinContent(Integer customerInfoId,Integer labelId,String month){
+		String month1 = month.split("-")[0];
+		String month2 = month.split("-")[1];
+		if(month2.length() == 1) {
+			month2 = "0"+month2;
+		}
+		month = month1 + "-" + month2;
+		return this.clockinContentMapper.selectMonthListClockinContent(customerInfoId, labelId, month);
+	}
+	
 
 	@Override
 	public ClockinContentVo getTodayClockinContentVo(Integer customerInfoId, Integer labelId) {

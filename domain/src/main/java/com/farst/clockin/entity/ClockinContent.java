@@ -1,5 +1,5 @@
 package com.farst.clockin.entity; 
-import java.util.Date;
+import java.util.Date; 
 
 import com.farst.common.entity.BasicEntity;
 import io.swagger.annotations.ApiModel;
@@ -40,10 +40,10 @@ public class ClockinContent extends BasicEntity {
     @ApiModelProperty(value = "正常删除状态(0正常,1为删除)")
     private Integer status;
 
-    @ApiModelProperty(value = "创建时间")
+    @ApiModelProperty(value = "创建时间") 
     private Date createDate;
 
-    @ApiModelProperty(value = "最近修改时间")
+    @ApiModelProperty(value = "最近修改时间")  
     private Date lastEditTime;
 
 

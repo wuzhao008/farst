@@ -29,6 +29,22 @@
     	   and status = 0
     </select>
     
+    <select id="selectCurMonthListClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
+    	select * from clockin_content 
+    	 where customer_info_id = #{customerInfoId} 
+    	   and clockin_label_id = #{clockinLabelId} 
+    	   and DATE_FORMAT(create_date,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')
+    	   and status = 0
+    </select>
+    
+    <select id="selectMonthListClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
+	    select * from clockin_content 
+	    	 where customer_info_id = #{customerInfoId} 
+	    	   and clockin_label_id = #{clockinLabelId} 
+	    	   and DATE_FORMAT(create_date,'%Y-%m') = #{month}
+	    	   and status = 0
+    </select>
+    
     <select id="selectPageTodayClockinVo" resultType="com.farst.clockin.vo.TodayClockinVo">
       select t.*,round(statistics_clockin_days/statistics_days,0) as statistics_rate
 		from (select  
@@ -120,5 +136,38 @@
     	update clockin_content set content = #{content},last_edit_time = NOW() where id = #{id}
     </update>
     
+    <select id="selectListClockinTrendStatisticsVo" resultType="com.farst.clockin.vo.ClockinTrendStatisticsVo">
+		  select t.`name` as period_name,
+		         t.`clockin_count` as clockin_days,
+		         t.`total_count` as plan_days,
+		         round(t.`clockin_count`*100/t.`total_count`,2) as clockin_rate 
+		    from
+		  (
+		       select a.`name`,count(distinct b.id) as clockin_count,
+		              (select d.`freq_value` 
+		                 from `clockin_setting` d
+		                where d.`status` = 0 
+		                  and d.`freq_type` = a.`type`
+		                  and d.`freq_start_date` &lt;= a.`time_start`
+		                  and d.`customer_label_id` = #{customerLabelId}
+		                order by d.`id` desc limit 1
+					   ) as total_count
+		         from `clockin_statistics_date` a 
+		    left join `clockin_content` b 
+		           on b.`customer_info_id` = #{customerInfoId}
+		          and b.`clockin_label_id` = #{clockinLabelId}
+		     	  and b.`status` = 0 
+		     	  and b.`create_date` between a.`time_start` and a.`time_end`
+		    left join `customer_label` c
+		           on c.`status` = 0
+		          and c.`customer_info_id` = b.`customer_info_id`
+		          and c.`clockin_label_id` = b.`clockin_label_id`
+		    where a.`type` = #{type}
+		  and a.`time_end` >= (select min(c.create_date) from `clockin_content` c where c.`customer_info_id` = #{customerInfoId} and c.`clockin_label_id` = #{clockinLabelId} )
+		  and a.`time_start` &lt;= NOW()
+		  group by a.name
+		  order by a.id asc 
+		  )  t
+    </select>
 
 </mapper>
