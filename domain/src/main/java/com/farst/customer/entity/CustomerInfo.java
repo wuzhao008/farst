@@ -1,6 +1,5 @@
 package com.farst.customer.entity;
-
-import java.time.LocalDate; 
+ 
 import java.util.Date;
 
 import com.farst.common.entity.BasicEntity;
@@ -42,8 +41,8 @@ public class CustomerInfo extends BasicEntity {
     @ApiModelProperty(value = "昵称")
     private String nickName;
 
-    @ApiModelProperty(value = "生日")
-    private LocalDate birthday;
+    @ApiModelProperty(value = "年代")
+    private String decade;
 
     @ApiModelProperty(value = "口号")
     private String slogan;

@@ -1,4 +1,4 @@
-package com.farst.clockin.entity;
+package com.farst.customer.entity;
  
 import java.util.Date;
 
@@ -19,22 +19,19 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value="ClockinSetting对象", description="打卡设置")
-public class ClockinSetting extends BasicEntity {
+public class CustomerHabbitSetting extends BasicEntity {
 
     private static final long serialVersionUID = 1L; 
 
-    @ApiModelProperty(value = "用户标签ID")
-    private Integer customerLabelId;
+    @ApiModelProperty(value = "用户习惯ID")
+    private Integer customerHabbitId;
 
     @ApiModelProperty(value = "频率类型（1每周、2每月、3每年）")
     private Integer freqType;
 
     @ApiModelProperty(value = "每周每月每年时对应的天数")
     private String freqValue;
-
-    @ApiModelProperty(value = "是否自动弹出写日志")
-    private Integer popupLog;
-
+    
     @ApiModelProperty(value = "设置的对应周期开始日期")
     private Date freqStartDate;
 

@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.farst.clockin.entity.ClockinContent">
         <result column="id" property="id" />
         <result column="customer_info_id" property="customerInfoId" />
-        <result column="clockin_label_id" property="clockinLabelId" />
+        <result column="customer_habbit_id" property="customerHabbitId" />
         <result column="is_public" property="isPublic"/>
         <result column="content" property="content" />
         <result column="check_status" property="checkStatus" />
@@ -18,13 +18,13 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        customer_info_id, clockin_label_id, is_public,content, check_status, status, create_date, last_edit_time
+        customer_info_id, customer_habbit_id, is_public,content, check_status, status, create_date, last_edit_time
     </sql>
     
     <select id ="selectTodayClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
     	select * from clockin_content 
     	 where customer_info_id = #{customerInfoId} 
-    	   and clockin_label_id = #{clockinLabelId} 
+    	   and customer_habbit_id = #{customerHabbitId} 
     	   and to_days(create_date) = to_days(now()) 
     	   and status = 0
     </select>
@@ -32,7 +32,7 @@
     <select id="selectCurMonthListClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
     	select * from clockin_content 
     	 where customer_info_id = #{customerInfoId} 
-    	   and clockin_label_id = #{clockinLabelId} 
+    	   and customer_habbit_id = #{customerHabbitId} 
     	   and DATE_FORMAT(create_date,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')
     	   and status = 0
     </select>
@@ -40,19 +40,20 @@
     <select id="selectMonthListClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
 	    select * from clockin_content 
 	    	 where customer_info_id = #{customerInfoId} 
-	    	   and clockin_label_id = #{clockinLabelId} 
+	    	   and customer_habbit_id = #{customerHabbitId} 
 	    	   and DATE_FORMAT(create_date,'%Y-%m') = #{month}
 	    	   and status = 0
     </select>
     
     <select id="selectPageTodayClockinVo" resultType="com.farst.clockin.vo.TodayClockinVo">
-      select t.*,round(statistics_clockin_days/statistics_days,0) as statistics_rate
+       select t.*,round(statistics_clockin_days/statistics_days,0) as statistics_rate
 		from (select  
-		       c.`id` as label_id,
+		       b.`id` as habbit_id,
+		       b.`habbit_name`,
 		       c.`label_name`, 
 			   c.`label_pic_url`,
 			   d.id,
-			   a.`popup_log`,
+			   b.`popup_log`,
 			   a.`freq_type` as statistics_type,
 			   a.`freq_value` as statistics_days,
 			   (
@@ -60,8 +61,8 @@
 			   		(
 			   		select count(d.`id`) 
 			   		  from `clockin_content` d 
-			   		 where d.customer_info_id = #{customerInfoId}
-			   		   and d.`clockin_label_id` = b.id 
+			   		 where d.`customer_info_id` =  #{customerInfoId}
+			   		   and d.`customer_habbit_id` = b.id 
 			   		   and d.`status` = 0
 			   		   and d.`create_date` BETWEEN subdate(curdate(),date_format(curdate(),'%w')-1) and subdate(curdate(),date_format(curdate(),'%w')-8)
 			   		)
@@ -69,8 +70,8 @@
 			   		(
 			   		select count(d.`id`) 
 			   		  from `clockin_content` d 
-			   		 where d.customer_info_id = #{customerInfoId}
-			   		   and d.`clockin_label_id` = b.id 
+			   		 where d.`customer_info_id` =  #{customerInfoId}
+			   		   and d.`customer_habbit_id` = b.id 
 			   		   and d.`status` = 0
 			   		   and d.`create_date` BETWEEN date_add(curdate(),interval -day(curdate())+1 day) and date_add(last_day(curdate()),interval 1 day)
 			   		)
@@ -78,21 +79,21 @@
 			   		(
 			   		select count(d.`id`) 
 			   		  from `clockin_content` d 
-			   		 where d.customer_info_id = #{customerInfoId}
-			   		   and d.`clockin_label_id` = b.id 
+			   		 where d.`customer_info_id` =  #{customerInfoId}
+			   		   and d.`customer_habbit_id` = b.id 
 			   		   and d.`status` = 0
 			   		   and d.`create_date` BETWEEN DATE_SUB(CURDATE(),INTERVAL dayofyear(now())-1 DAY) and concat(YEAR(now()),'-12-31 23:59:59')
 			   		)
 			   end 
 			   ) as statistics_clockin_days
-		 from (select * from `clockin_setting` where freq_start_date &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d') order by freq_start_date desc limit 1)a
-		join `customer_label` b 
-		on a.`customer_label_id` = b.id 
+		 from (select * from `customer_habbit_setting` where freq_start_date &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d') order by freq_start_date desc limit 1) a
+		join `customer_habbit` b 
+		on a.`customer_habbit_id` = b.id 
 		join `clockin_label` c 
 		on b.`clockin_label_id` = c.id
 		left join `clockin_content` d
-		on d.`clockin_label_id` = b.`clockin_label_id`
-		and d.`customer_info_id` = #{customerInfoId}
+		on d.`customer_habbit_id` = b.`id`
+		and d.`customer_info_id` =  #{customerInfoId}
 		and d.`status` = 0 
 		and DATE_FORMAT(d.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') 
 		where b.`customer_info_id` = #{customerInfoId}
@@ -104,16 +105,17 @@
     
     
     <select id="selectPageSimilarClockinContent" resultType="com.farst.clockin.entity.ClockinContent">
-    	select a.* 
-		  from clockin_content a
+    		select a.* 
+		  from `clockin_content` a,`customer_habbit` b 
 		 where a.`customer_info_id` != #{customerInfoId}
 		   and a.`status` = 0
 		   and a.`is_public` = 1
 		   and a.`check_status` = 1
 		   and a.`content` is not null
-		   and a.`clockin_label_id` in (
+		   and a.`customer_habbit_id` = b.`id`
+		   and b.`clockin_label_id` in (
 		  	select b.`clockin_label_id` 
-		  	  from `customer_label` b 
+		  	  from `customer_habbit` b 
 		  	 where b.`status` = 0 
 		  	   and b.`customer_info_id` = #{customerInfoId}
 		   )
@@ -145,25 +147,25 @@
 		  (
 		       select a.`name`,count(distinct b.id) as clockin_count,
 		              (select d.`freq_value` 
-		                 from `clockin_setting` d
+		                 from `customer_habbit_setting` d
 		                where d.`status` = 0 
 		                  and d.`freq_type` = a.`type`
 		                  and d.`freq_start_date` &lt;= a.`time_start`
-		                  and d.`customer_label_id` = #{customerLabelId}
+		                  and d.`customer_habbit_id` = #{customerHabbitId}
 		                order by d.`id` desc limit 1
 					   ) as total_count
 		         from `clockin_statistics_date` a 
 		    left join `clockin_content` b 
 		           on b.`customer_info_id` = #{customerInfoId}
-		          and b.`clockin_label_id` = #{clockinLabelId}
+		          and b.`customer_habbit_id` = #{customerHabbitId}
 		     	  and b.`status` = 0 
 		     	  and b.`create_date` between a.`time_start` and a.`time_end`
-		    left join `customer_label` c
+		    left join `customer_habbit` c
 		           on c.`status` = 0
 		          and c.`customer_info_id` = b.`customer_info_id`
-		          and c.`clockin_label_id` = b.`clockin_label_id`
+		          and c.`id` = b.`customer_habbit_id`
 		    where a.`type` = #{type}
-		  and a.`time_end` >= (select min(c.create_date) from `clockin_content` c where c.`customer_info_id` = #{customerInfoId} and c.`clockin_label_id` = #{clockinLabelId} )
+		  and a.`time_end` >= (select min(c.create_date) from `clockin_content` c where c.`customer_info_id` = #{customerInfoId} and c.`id` = #{customerInfoId} )
 		  and a.`time_start` &lt;= NOW()
 		  group by a.name
 		  order by a.id asc 

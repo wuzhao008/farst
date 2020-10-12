@@ -9,8 +9,8 @@ import lombok.Data;
 @ApiModel(value="打卡日志dto", description="打卡日志dto")
 public class ClockinContentDto {
 	
-    @ApiModelProperty(value = "标签ID")
-    private Integer labelId;
+    @ApiModelProperty(value = "习惯ID")
+    private Integer habbitId;
 
     @ApiModelProperty(value = "日志内容")
     private String content;

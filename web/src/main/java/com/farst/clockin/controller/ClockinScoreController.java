@@ -4,18 +4,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
  
 import com.farst.clockin.entity.ClockinContent;
-import com.farst.clockin.entity.ClockinLabel; 
-import com.farst.clockin.entity.ClockinSetting;
+import com.farst.clockin.entity.ClockinLabel;
 import com.farst.clockin.service.IClockinContentService; 
-import com.farst.clockin.service.IClockinLabelService; 
-import com.farst.clockin.service.IClockinSettingService; 
+import com.farst.clockin.service.IClockinLabelService;
 import com.farst.clockin.vo.ClockinCurMonthRecordVo;
 import com.farst.clockin.vo.ClockinTrendRecordVo;
 import com.farst.clockin.vo.ClockinTrendStatisticsVo;
-import com.farst.common.web.response.RestResponse; 
-import com.farst.customer.entity.CustomerLabel;
+import com.farst.common.web.response.RestResponse;
+import com.farst.customer.entity.CustomerHabbitSetting;
+import com.farst.customer.entity.CustomerHabbit;
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.customer.service.ICustomerLabelService;
+import com.farst.customer.service.ICustomerHabbitSettingService;
+import com.farst.customer.service.ICustomerHabbitService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,13 +52,13 @@ public class ClockinScoreController extends BasicController {
     private IClockinContentService clockinContentService;   
     
     @Autowired
-    private ICustomerLabelService customerLabelService;
+    private ICustomerHabbitService customerHabbitService;
     
     @Autowired
     private IClockinLabelService clockinLabelService;
     
     @Autowired
-    private IClockinSettingService clockinSettingService;
+    private ICustomerHabbitSettingService customerHabbitSettingService;;
  	
     /**
      * 查询本月的打卡记录
@@ -70,13 +70,13 @@ public class ClockinScoreController extends BasicController {
     	List<ClockinCurMonthRecordVo> listCcmrVo = new ArrayList<ClockinCurMonthRecordVo>();
         try {
     		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-    		 List<CustomerLabel> listCl = this.customerLabelService.getListCustomerLabel(custId);
-    		 if(CollectionUtils.isNotEmpty(listCl)) {
-    			 for(CustomerLabel cl : listCl) {
-     				ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
-    				ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getId());
+    		 List<CustomerHabbit> listCh = this.customerHabbitService.getListCustomerHabbit(custId);
+    		 if(CollectionUtils.isNotEmpty(listCh)) {
+    			 for(CustomerHabbit ch : listCh) {
+     				ClockinLabel label = this.clockinLabelService.getById(ch.getClockinLabelId());
+    				CustomerHabbitSetting setting = this.customerHabbitSettingService.getLatestHabbitSettingBy(ch.getId());
      				if(setting != null) {
-     					List<ClockinContent> listCc = this.clockinContentService.getCurMonthListClockinContent(custId, label.getId());
+     					List<ClockinContent> listCc = this.clockinContentService.getCurMonthListClockinContent(custId, ch.getId());
      					List<Map<String,Object>> listMap = new ArrayList<Map<String,Object>>();
      					if(CollectionUtils.isNotEmpty(listCc)) {
      						listCc.forEach(cc ->{
@@ -87,6 +87,7 @@ public class ClockinScoreController extends BasicController {
      						});
      					}
      					ClockinCurMonthRecordVo ccmrVo = new ClockinCurMonthRecordVo();
+     					ccmrVo.setCustomerHabbit(ch);
      					ccmrVo.setClockinLabel(label);
      					ccmrVo.setListClockinContent(listMap);
      					ccmrVo.setClockinDays(listMap.size());
@@ -108,12 +109,13 @@ public class ClockinScoreController extends BasicController {
      */
     @ApiOperation(value = "查询本月打卡记录-根据当前格式如2020-09格式的月份查询对应的打卡记录")
     @GetMapping(value = "/clockinRecordByMonth")
-    public RestResponse<ClockinCurMonthRecordVo> clockinRecordByMonth(@RequestHeader("tokenid") String tokenid,@RequestParam("clockinLabelId") Integer clockinLabelId,@RequestParam("month") String month){
+    public RestResponse<ClockinCurMonthRecordVo> clockinRecordByMonth(@RequestHeader("tokenid") String tokenid,@RequestParam("customerHabbitId") Integer customerHabbitId,@RequestParam("month") String month){
     	RestResponse<ClockinCurMonthRecordVo> response = new RestResponse<>(); 
         try {
-    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();  
-			ClockinLabel label = this.clockinLabelService.getById(clockinLabelId);  
-			List<ClockinContent> listCc = this.clockinContentService.getMonthListClockinContent(custId, clockinLabelId, month);
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId(); 
+    		CustomerHabbit habbit = this.customerHabbitService.getById(customerHabbitId);
+			ClockinLabel label = this.clockinLabelService.getById(habbit.getClockinLabelId());  
+			List<ClockinContent> listCc = this.clockinContentService.getMonthListClockinContent(custId, customerHabbitId, month);
 			List<Map<String,Object>> listMap = new ArrayList<Map<String,Object>>();
 			if(CollectionUtils.isNotEmpty(listCc)) {
 				listCc.forEach(cc ->{
@@ -124,6 +126,7 @@ public class ClockinScoreController extends BasicController {
 				});
 			}
 			ClockinCurMonthRecordVo ccmrVo = new ClockinCurMonthRecordVo();
+			ccmrVo.setCustomerHabbit(habbit);
 			ccmrVo.setClockinLabel(label);
 			ccmrVo.setListClockinContent(listMap);
 			ccmrVo.setClockinDays(listMap.size()); 
@@ -146,18 +149,16 @@ public class ClockinScoreController extends BasicController {
     	List<ClockinTrendRecordVo> listCtrVo = new ArrayList<ClockinTrendRecordVo>();
         try {
     		 Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-    		 List<CustomerLabel> listCl = this.customerLabelService.getListCustomerLabel(custId);
-    		 if(CollectionUtils.isNotEmpty(listCl)) {
-    			 for(CustomerLabel cl : listCl) {
-     				ClockinLabel label = this.clockinLabelService.getById(cl.getClockinLabelId());
-    				ClockinSetting setting = this.clockinSettingService.getLatestClockingSettingBy(cl.getId());
-     				if(setting != null && setting.getFreqType().intValue() == type.intValue()) {
-     					List<ClockinTrendStatisticsVo> listCtsVo = this.clockinContentService.getListClockinTrendStatisticsVo(custId, cl.getId(), label.getId(), type);
-     					ClockinTrendRecordVo ctrVo = new ClockinTrendRecordVo();
-     					ctrVo.setClockinLabel(label);
-     					ctrVo.setListClockinTrendStatisticsVo(listCtsVo);
-     					listCtrVo.add(ctrVo);
-     				}
+    		 List<CustomerHabbit> listCh = this.customerHabbitService.getListCustomerHabbit(custId);
+    		 if(CollectionUtils.isNotEmpty(listCh)) {
+    			 for(CustomerHabbit ch : listCh) {
+     				ClockinLabel label = this.clockinLabelService.getById(ch.getClockinLabelId());
+ 					List<ClockinTrendStatisticsVo> listCtsVo = this.clockinContentService.getListClockinTrendStatisticsVo(custId, ch.getId(), type);
+ 					ClockinTrendRecordVo ctrVo = new ClockinTrendRecordVo();
+ 					ctrVo.setCustomerHabbit(ch);
+ 					ctrVo.setClockinLabel(label);
+ 					ctrVo.setListClockinTrendStatisticsVo(listCtsVo);
+ 					listCtrVo.add(ctrVo); 
     			 }
     		 }
        	 response.setSuccess(listCtrVo);

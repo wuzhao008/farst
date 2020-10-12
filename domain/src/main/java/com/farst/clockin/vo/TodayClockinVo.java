@@ -14,9 +14,12 @@ public class TodayClockinVo implements Serializable{
 	
 	@ApiModelProperty(value = "打卡ID-如果当天没有打卡则为空", required = false)
 	private Integer id;
-	
-	@ApiModelProperty(value = "标签ID", required = true)
-	private Integer labelId;
+
+	@ApiModelProperty(value = "习惯ID", required = true)
+	private Integer habbitId;
+
+	@ApiModelProperty(value = "习惯名称", required = true)
+	private String habbitName;
 	
 	@ApiModelProperty(value = "标签名称", required = true)
 	private String labelName;
@@ -30,7 +33,7 @@ public class TodayClockinVo implements Serializable{
 	@ApiModelProperty(value = "统计类型（1按周、2按月、3按年）", required = true)
 	private Integer statisticsType;
 
-	@ApiModelProperty(value = "统计天数-周期内完成了多少天", required = true)
+	@ApiModelProperty(value = "统计天数-周期内目标天数", required = true)
 	private Integer statisticsDays;
 	
 	@ApiModelProperty(value = "统计天数-周期内打卡天数", required = true)

@@ -58,19 +58,19 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * 得到当天用户对应习惯的打卡内容
 	 * 
 	 * @param customerInfoId
-	 * @param labelId
+	 * @param habbitId
 	 * @return
 	 */
-	public ClockinContent getTodayClockinContent(Integer customerInfoId,Integer labelId);
+	public ClockinContent getTodayClockinContent(Integer customerInfoId,Integer habbitId);
 	
 	/**
 	 * 查询当月用户对应习惯打卡内容列表
 	 * 
 	 * @param customerInfoId
-	 * @param labelId
+	 * @param habbitId
 	 * @return
 	 */
-	public List<ClockinContent> getCurMonthListClockinContent(Integer customerInfoId,Integer labelId);
+	public List<ClockinContent> getCurMonthListClockinContent(Integer customerInfoId,Integer habbitId);
 	
 	/**
 	 * 查询用户对应习惯对应月份的打卡内容列表
@@ -78,7 +78,7 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @param month
 	 * @return
 	 */
-	public List<ClockinContent> getMonthListClockinContent(Integer customerInfoId,Integer labelId,String month);
+	public List<ClockinContent> getMonthListClockinContent(Integer customerInfoId,Integer habbitId,String month);
 	
 	/**
 	 * 查询用户对应习惯的趋势统计记录
@@ -88,15 +88,15 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @param type
 	 * @return
 	 */
-	public List<ClockinTrendStatisticsVo> getListClockinTrendStatisticsVo(Integer customerInfoId,Integer customerLabelId,Integer labelId,Integer type);
+	public List<ClockinTrendStatisticsVo> getListClockinTrendStatisticsVo(Integer customerInfoId,Integer habbitId, Integer type);
 	
 	/**
 	 * 得到当天用户对应习惯打卡内容VO（含图片url）
 	 * @param customerInfoId
-	 * @param labelId
+	 * @param habbitId
 	 * @return
 	 */
-	public ClockinContentVo getTodayClockinContentVo(Integer customerInfoId,Integer labelId);
+	public ClockinContentVo getTodayClockinContentVo(Integer customerInfoId,Integer habbitId);
 	
 	/**
 	 * 今日打卡
@@ -104,7 +104,7 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @param customerInfoId
 	 * @param labelId
 	 */
-	public void todayClockin(Integer customerInfoId,Integer labelId);
+	public void todayClockin(Integer customerInfoId,Integer habbitId);
 	
 	/**
 	 * 撤销今日打卡
@@ -112,18 +112,18 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 * @param customerInfoId
 	 * @param labelId
 	 */
-	public void reverseTodayClockin(Integer customerInfoId,Integer labelId);
+	public void reverseTodayClockin(Integer customerInfoId,Integer habbitId);
 	
 	/**
 	 * 发布今日打卡内容 
 	 * 
 	 * @param customerInfoId
-	 * @param labelId
+	 * @param habbitId
 	 * @param content
 	 * @param picUrls
 	 * @param isPublic
 	 */
-	public void publishTodayClockinContent(Integer customerInfoId,Integer labelId,String content,List<String> picUrls,Integer isPublic);
+	public void publishTodayClockinContent(Integer customerInfoId,Integer habbitId,String content,List<String> picUrls,Integer isPublic);
 	
 	/**
 	 * 修改id对应记录的content

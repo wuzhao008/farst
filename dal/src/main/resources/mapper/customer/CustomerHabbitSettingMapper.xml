@@ -3,12 +3,11 @@
 <mapper namespace="com.farst.clockin.mapper.ClockinSettingMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.farst.clockin.entity.ClockinSetting">
+    <resultMap id="BaseResultMap" type="com.farst.customer.entity.CustomerHabbitSetting">
         <result column="id" property="id" />
-        <result column="customer_label_id" property="customerLabelId" />
+        <result column="customer_habbit_id" property="customerHabbitId" />
         <result column="freq_type" property="freqType" />
-        <result column="freq_value" property="freqValue" />
-        <result column="popup_log" property="popupLog" />
+        <result column="freq_value" property="freqValue" /> 
         <result column="freq_start_date" property="freqStartDate" />
         <result column="status" property="status" />
         <result column="create_date" property="createDate" />
@@ -17,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id,customer_label_id, freq_type, freq_value, popup_log, freq_start_date, status, create_date, last_edit_time
+        id,customer_habbit_id, freq_type, freq_value, freq_start_date, status, create_date, last_edit_time
     </sql>
 
 </mapper>

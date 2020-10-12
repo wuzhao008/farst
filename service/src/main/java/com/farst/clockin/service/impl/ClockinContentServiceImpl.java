@@ -38,6 +38,7 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	
 	@Override
 	public IPage<TodayClockinVo> getPageTodayClockinVo(IPage<TodayClockinVo> page, Integer customerInfoId) {
+		
 		return this.clockinContentMapper.selectPageTodayClockinVo(page, customerInfoId);
 	}
 
@@ -61,36 +62,36 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	
 	
 	@Override
-	public ClockinContent getTodayClockinContent(Integer customerInfoId, Integer labelId) {
-		return this.clockinContentMapper.selectTodayClockinContent(customerInfoId, labelId);
+	public ClockinContent getTodayClockinContent(Integer customerInfoId, Integer habbitId) {
+		return this.clockinContentMapper.selectTodayClockinContent(customerInfoId, habbitId);
 	}
 
 	@Override
-	public List<ClockinContent> getCurMonthListClockinContent(Integer customerInfoId,Integer labelId){
-		return this.clockinContentMapper.selectCurMonthListClockinContent(customerInfoId, labelId);
+	public List<ClockinContent> getCurMonthListClockinContent(Integer customerInfoId,Integer habbitId){
+		return this.clockinContentMapper.selectCurMonthListClockinContent(customerInfoId, habbitId);
 	}
 
 	@Override
-	public List<ClockinTrendStatisticsVo> getListClockinTrendStatisticsVo(Integer customerInfoId,Integer customerLabelId,Integer labelId,Integer type){
-		return this.clockinContentMapper.selectListClockinTrendStatisticsVo(customerInfoId, customerLabelId, labelId,type);
+	public List<ClockinTrendStatisticsVo> getListClockinTrendStatisticsVo(Integer customerInfoId,Integer customerHabbitId,Integer type){
+		return this.clockinContentMapper.selectListClockinTrendStatisticsVo(customerInfoId, customerHabbitId,type);
 	}
 
 	@Override
-	public List<ClockinContent> getMonthListClockinContent(Integer customerInfoId,Integer labelId,String month){
+	public List<ClockinContent> getMonthListClockinContent(Integer customerInfoId,Integer habbitId,String month){
 		String month1 = month.split("-")[0];
 		String month2 = month.split("-")[1];
 		if(month2.length() == 1) {
 			month2 = "0"+month2;
 		}
 		month = month1 + "-" + month2;
-		return this.clockinContentMapper.selectMonthListClockinContent(customerInfoId, labelId, month);
+		return this.clockinContentMapper.selectMonthListClockinContent(customerInfoId, habbitId, month);
 	}
 	
 
 	@Override
-	public ClockinContentVo getTodayClockinContentVo(Integer customerInfoId, Integer labelId) {
+	public ClockinContentVo getTodayClockinContentVo(Integer customerInfoId, Integer habbitId) {
 		ClockinContentVo ccVo = new ClockinContentVo();
-		ClockinContent cc = this.getTodayClockinContent(customerInfoId, labelId);
+		ClockinContent cc = this.getTodayClockinContent(customerInfoId, habbitId);
 		ccVo.setClockinContent(cc);
 		if(cc!=null) {
 			List<ClockinPicture> clockinPictures = clockinPictureService.getAllClockinPictureByContentId(cc.getId());
@@ -100,12 +101,12 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	}
 	
 	@Override
-	public void todayClockin(Integer customerInfoId, Integer labelId) {
-		ClockinContent cc = this.getTodayClockinContent(customerInfoId, labelId);
+	public void todayClockin(Integer customerInfoId, Integer habbitId) {
+		ClockinContent cc = this.getTodayClockinContent(customerInfoId, habbitId);
 		if(cc == null) {
 			cc = new ClockinContent();
 			cc.setCustomerInfoId(customerInfoId);
-			cc.setClockinLabelId(labelId);
+			cc.setCustomerHabbitId(habbitId);
 			cc.setCreateDate(new Date());
 			cc.setCheckStatus(0);
 			cc.setStatus(0);
@@ -114,8 +115,8 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	}
 	
 	@Override
-	public void reverseTodayClockin(Integer customerInfoId, Integer labelId) {
-		ClockinContent cc = this.getTodayClockinContent(customerInfoId, labelId);
+	public void reverseTodayClockin(Integer customerInfoId, Integer habbitId) {
+		ClockinContent cc = this.getTodayClockinContent(customerInfoId, habbitId);
 		if(cc != null) {
 			cc.setStatus(1);
 			cc.setLastEditTime(new Date());
@@ -124,9 +125,9 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	}
 	
 	@Override
-	public void publishTodayClockinContent(Integer customerInfoId, Integer labelId, String content,
+	public void publishTodayClockinContent(Integer customerInfoId, Integer habbitId, String content,
 			List<String> picUrls, Integer isPublic) {
-		ClockinContent cc = this.getTodayClockinContent(customerInfoId, labelId);
+		ClockinContent cc = this.getTodayClockinContent(customerInfoId, habbitId);
 		if(cc != null) {
 			cc.setContent(content);
 			cc.setIsPublic(isPublic);

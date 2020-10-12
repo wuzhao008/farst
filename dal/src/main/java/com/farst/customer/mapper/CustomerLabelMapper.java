@@ -1,7 +1,7 @@
 package com.farst.customer.mapper;
 
 import com.farst.common.mybatis.mapper.BasicMapper;
-import com.farst.customer.entity.CustomerLabel;
+import com.farst.customer.entity.CustomerHabbit;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.farst.customer.entity.CustomerLabel;
  * @author MichaelWoo
  * @since 2020-09-07
  */
-public interface CustomerLabelMapper extends BasicMapper<CustomerLabel> {
+public interface CustomerLabelMapper extends BasicMapper<CustomerHabbit> {
 
 }

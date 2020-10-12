@@ -3,10 +3,12 @@
 <mapper namespace="com.farst.customer.mapper.CustomerLabelMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.farst.customer.entity.CustomerLabel">
+    <resultMap id="BaseResultMap" type="com.farst.customer.entity.CustomerHabbit">
         <result column="id" property="id" />
+        <result column="habbit_name" property="habbitName" />
         <result column="customer_info_id" property="customerInfoId" />
         <result column="clockin_label_id" property="clockinLabelId" />
+        <result column="popup_log" property="popupLog" />
         <result column="status" property="status" />
         <result column="create_date" property="createDate" />
         <result column="last_edit_time" property="lastEditTime" />
@@ -15,7 +17,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        customer_info_id, clockin_label_id, status, create_date, last_edit_time
+        customer_info_id, habbit_name,clockin_label_id, popup_log, status, create_date, last_edit_time
     </sql>
 
 </mapper>

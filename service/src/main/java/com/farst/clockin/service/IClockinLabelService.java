@@ -3,6 +3,7 @@ package com.farst.clockin.service;
 import java.util.List;
 
 import com.farst.clockin.entity.ClockinLabel;
+import com.farst.clockin.vo.AllClockinLabelVo;
 import com.farst.common.service.IBasicService;
 
 /**
@@ -31,4 +32,11 @@ public interface IClockinLabelService extends IBasicService<ClockinLabel> {
 	 * @return
 	 */
 	public List<ClockinLabel> getListClockinLabelByListId(List<Integer> listLabelId);
+	 
+	/**
+	 * 查询所有的层级标签信息列表
+	 *  
+	 * @return
+	 */
+	public List<AllClockinLabelVo> getListAllClockinLabelVo();
 }

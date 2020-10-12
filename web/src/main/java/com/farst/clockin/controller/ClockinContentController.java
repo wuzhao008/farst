@@ -17,9 +17,9 @@ import com.farst.clockin.vo.ClockinLogVo;
 import com.farst.clockin.vo.TodayClockinVo; 
 import com.farst.common.web.response.RestResponse;
 import com.farst.customer.entity.CustomerInfo;
-import com.farst.customer.entity.CustomerLabel;
+import com.farst.customer.entity.CustomerHabbit;
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.customer.service.ICustomerLabelService;
+import com.farst.customer.service.ICustomerHabbitService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -68,7 +68,7 @@ public class ClockinContentController extends BasicController {
     private IClockinReviewService clockinReviewService;
     
     @Autowired
-    private ICustomerLabelService customerLabelService;
+    private ICustomerHabbitService customerHabbitService;
     
     @Autowired
     private IClockinLabelService clockinLabelService;
@@ -98,11 +98,11 @@ public class ClockinContentController extends BasicController {
      */
     @ApiOperation(value = "查询今日打卡详细信息")
     @GetMapping(value = "/detailTodayClockin")
-    public RestResponse<ClockinContentVo> detailTodayClockin(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "labelId") Integer labelId){
+    public RestResponse<ClockinContentVo> detailTodayClockin(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "habbitId") Integer habbitId){
         RestResponse<ClockinContentVo> response = new RestResponse<>();
     	try {
      		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-     		ClockinContentVo ccVo = this.clockinContentService.getTodayClockinContentVo(custId, labelId);
+     		ClockinContentVo ccVo = this.clockinContentService.getTodayClockinContentVo(custId, habbitId);
 	    	response.setSuccess(ccVo);
     	}catch (Exception e) {
             e.printStackTrace();
@@ -115,16 +115,16 @@ public class ClockinContentController extends BasicController {
  
     @ApiOperation(value = "今日打卡")
     @PostMapping(value = "/todayClockin")
-    public RestResponse<String> todayClockin(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "labelId") int labelId){
+    public RestResponse<String> todayClockin(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "habbitId") int habbitId){
     	RestResponse<String> response = new RestResponse<String>();
     	try {
      		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-     		CustomerLabel cl = this.customerLabelService.getCustomerLabel(custId, labelId);
+     		CustomerHabbit cl = this.customerHabbitService.getById(habbitId);
      		if(cl == null) {
-     			response.setErrorMsg("非法习惯，请先选择习惯");
+     			response.setErrorMsg("非法习惯");
      			return response;
      		}
-    		this.clockinContentService.todayClockin(custId, labelId);
+    		this.clockinContentService.todayClockin(custId, habbitId);
     		response.setSuccess("打卡成功");
     	}catch (Exception e) {
             e.printStackTrace();
@@ -136,11 +136,11 @@ public class ClockinContentController extends BasicController {
     
     @ApiOperation(value = "撤销今日打卡")
     @PostMapping(value = "/reverseTodayClockin")
-    public RestResponse<String> reverseTodayClockin(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "labelId") int labelId){
+    public RestResponse<String> reverseTodayClockin(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "habbitId") int habbitId){
     	RestResponse<String> response = new RestResponse<String>();
     	try {
      		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-    		this.clockinContentService.reverseTodayClockin(custId, labelId);
+    		this.clockinContentService.reverseTodayClockin(custId, habbitId);
     		response.setSuccess("撤销打卡成功");
     	}catch (Exception e) {
             e.printStackTrace();
@@ -156,7 +156,7 @@ public class ClockinContentController extends BasicController {
     	RestResponse<String> response = new RestResponse<String>();
     	try {
      		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-     		ClockinContent cc = this.clockinContentService.getTodayClockinContent(custId, clockinContentDto.getLabelId());
+     		ClockinContent cc = this.clockinContentService.getTodayClockinContent(custId, clockinContentDto.getHabbitId());
      		if(cc == null) {
      			response.setErrorMsg("打卡后才能发布日志");
      			return response;
@@ -166,7 +166,7 @@ public class ClockinContentController extends BasicController {
      		if(StringUtils.isNoneEmpty(clockinContentDto.getPicUrl())) {
      			listPicUrl = Arrays.asList(clockinContentDto.getPicUrl().split(","));
      		}
-     		this.clockinContentService.publishTodayClockinContent(custId, clockinContentDto.getLabelId(), clockinContentDto.getContent(), listPicUrl, clockinContentDto.getIsPublic());
+     		this.clockinContentService.publishTodayClockinContent(custId, clockinContentDto.getHabbitId(), clockinContentDto.getContent(), listPicUrl, clockinContentDto.getIsPublic());
      		response.setSuccess("发布打卡日志成功");
     	}catch (Exception e) {
             e.printStackTrace();
@@ -220,20 +220,27 @@ public class ClockinContentController extends BasicController {
       		List<Integer> listCcId = new ArrayList<Integer>();
       		List<Integer> listCustId = new ArrayList<Integer>();
       		List<Integer> listLabelId = new ArrayList<Integer>();
+      		List<Integer> listHabbitId = new ArrayList<Integer>();
       		List<ClockinPicture> listCp = null;
       		List<CustomerInfo> listCust = null;
       		List<ClockinLabel> listLabel = null;
+      		List<CustomerHabbit> listHabbit = null;
       		List<Map<String,Object>> listReviewCnt = null;
       		List<Map<String,Object>> listUpCnt = null;
       		List<Integer> listCcupId = null;
-      		
       		
       		if(CollectionUtils.isNotEmpty(listCc)) {
       			listCc.forEach(cc->{
       				listCcId.add(cc.getId());
       				listCustId.add(cc.getCustomerInfoId());
-      				listLabelId.add(cc.getClockinLabelId());
+      				listHabbitId.add(cc.getCustomerHabbitId());
       			});
+
+          		listHabbit = this.customerHabbitService.getListCustomerHabbitByListId(listHabbitId);
+          		listHabbit.forEach(habbit->{
+          			listLabelId.add(habbit.getClockinLabelId());
+          		});
+          		
       			listCp = this.clockinPictureService.getAllClockinPictureByListContentId(listCcId);
           		listCust = this.customerInfoService.getListCustomerInfoBy(listCustId);
           		listLabel = this.clockinLabelService.getListClockinLabelByListId(listLabelId);
@@ -269,12 +276,18 @@ public class ClockinContentController extends BasicController {
       						}
       					}
       				}
-      				
-      				//构造习惯信息
-      				if(CollectionUtils.isNotEmpty(listLabel)) {
-      					for(ClockinLabel label : listLabel) {
-      						if(label.getId().equals(cc.getClockinLabelId())) {
-      							clVo.setClockinLabel(label);
+
+      				//构造习惯信息和标签信息
+      				if(CollectionUtils.isNotEmpty(listHabbit)) {
+      					for(CustomerHabbit habbit : listHabbit) {
+      						if(habbit.getId().equals(cc.getCustomerHabbitId())) {
+      							clVo.setCustomerHabbit(habbit);
+      							for(ClockinLabel label : listLabel) {
+      								if(label.getId().equals(habbit.getClockinLabelId())) {
+      									clVo.setClockinLabel(label);
+      									break;
+      								}
+      							}
       							break;
       						}
       					}
@@ -342,23 +355,30 @@ public class ClockinContentController extends BasicController {
       		//为了减少数据库循环请求，一次性从数据库中根据列表内容ID获取对应的数据
       		List<Integer> listCcId = new ArrayList<Integer>(); 
       		List<Integer> listLabelId = new ArrayList<Integer>();
+      		List<Integer> listHabbitId = new ArrayList<Integer>();
       		List<ClockinPicture> listCp = null; 
       		List<ClockinLabel> listLabel = null;
+      		List<CustomerHabbit> listHabbit = null;
       		List<Map<String,Object>> listReviewCnt = null;
       		List<Map<String,Object>> listUpCnt = null;
       		List<Integer> listCcupId = null;
       		
-      		
       		if(CollectionUtils.isNotEmpty(listCc)) {
       			listCc.forEach(cc->{
       				listCcId.add(cc.getId()); 
-      				listLabelId.add(cc.getClockinLabelId());
+      				listHabbitId.add(cc.getCustomerHabbitId());
       			});
+          		listHabbit = this.customerHabbitService.getListCustomerHabbitByListId(listHabbitId);
+          		listHabbit.forEach(habbit->{
+          			listLabelId.add(habbit.getClockinLabelId());
+          		});
+          		
       			listCp = this.clockinPictureService.getAllClockinPictureByListContentId(listCcId); 
           		listLabel = this.clockinLabelService.getListClockinLabelByListId(listLabelId);
           		listReviewCnt = this.clockinReviewService.getMapReviewCountsByListContentId(listCcId);
           		listUpCnt = this.clockinContentUpService.getMapContentUpsByListContentId(listCcId);
           		listCcupId = this.clockinContentUpService.getMyUpContentIds(listCcId, custId);
+          		
           		
       			for(ClockinContent cc : listCc) {
       				ClockinLogVo clVo = new ClockinLogVo();
@@ -381,12 +401,18 @@ public class ClockinContentController extends BasicController {
       				
       				//构造用户信息
       				clVo.setCustomerInfo(cust);
-      				
-      				//构造习惯信息
-      				if(CollectionUtils.isNotEmpty(listLabel)) {
-      					for(ClockinLabel label : listLabel) {
-      						if(label.getId().equals(cc.getClockinLabelId())) {
-      							clVo.setClockinLabel(label);
+
+      				//构造习惯信息和标签信息
+      				if(CollectionUtils.isNotEmpty(listHabbit)) {
+      					for(CustomerHabbit habbit : listHabbit) {
+      						if(habbit.getId().equals(cc.getCustomerHabbitId())) {
+      							clVo.setCustomerHabbit(habbit);
+      							for(ClockinLabel label : listLabel) {
+      								if(label.getId().equals(habbit.getClockinLabelId())) {
+      									clVo.setClockinLabel(label);
+      									break;
+      								}
+      							}
       							break;
       						}
       					}
@@ -438,7 +464,7 @@ public class ClockinContentController extends BasicController {
      */
     @ApiOperation(value = "根据日志内容ID查询日志内容")
     @GetMapping(value = "/getClockinLogById")
-    public RestResponse<ClockinLogVo> getClockinLogById(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "clockinContentId") Integer clockinContentId){
+    public RestResponse<ClockinLogVo> getClockinLogById(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "contentId") Integer contentId){
         RestResponse<ClockinLogVo> response = new RestResponse<>();
     	try {
      		ClockinLogVo clVo = new ClockinLogVo();
@@ -447,7 +473,7 @@ public class ClockinContentController extends BasicController {
      		clVo.setCustomerInfo(cust);
      		
      		ClockinContentVo ccVo = new ClockinContentVo();
-     		ClockinContent cc = this.clockinContentService.getById(clockinContentId);
+     		ClockinContent cc = this.clockinContentService.getById(contentId);
      		if((cc == null || cc.getStatus() !=0 )) {
      			response.setErrorMsg("非法请求");
      			return response;
@@ -457,7 +483,10 @@ public class ClockinContentController extends BasicController {
      		ccVo.setClockinPictures(listCp);
      		clVo.setClockinContentVo(ccVo);
      		
-     		ClockinLabel cl = this.clockinLabelService.getById(cc.getClockinLabelId());
+     		CustomerHabbit customerHabbit = this.customerHabbitService.getById(cc.getCustomerHabbitId());
+     		clVo.setCustomerHabbit(customerHabbit);
+     		
+     		ClockinLabel cl = this.clockinLabelService.getById(customerHabbit.getClockinLabelId());
      		clVo.setClockinLabel(cl);
      		
      		Long upCnt = this.clockinContentUpService.getUpCountByContentId(cc.getId());
@@ -466,7 +495,7 @@ public class ClockinContentController extends BasicController {
      		Long reviewCnt = this.clockinReviewService.getReviewCountByContentId(cc.getId());
      		clVo.setReviewCount(reviewCnt);
      		
-     		boolean isUp = this.clockinContentUpService.hasUpClockinContent(clockinContentId, custId);
+     		boolean isUp = this.clockinContentUpService.hasUpClockinContent(contentId, custId);
      		clVo.setIsUp(isUp);
      		
      		response.setSuccess(clVo);

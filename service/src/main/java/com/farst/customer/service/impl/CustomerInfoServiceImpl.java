@@ -1,11 +1,11 @@
 package com.farst.customer.service.impl;
 
 import com.farst.customer.entity.CustomerInfo;
-import com.farst.customer.entity.CustomerLabel;
+import com.farst.customer.entity.CustomerHabbit;
 import com.farst.customer.mapper.CustomerInfoMapper;
 import com.farst.customer.service.ICustomerFollowService;
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.customer.service.ICustomerLabelService;
+import com.farst.customer.service.ICustomerHabbitService;
 import com.farst.customer.vo.CustomerInfoVo;
 import com.farst.customer.vo.CustomerStatisticsVo;
 import com.farst.customer.vo.TokenCustVo;
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomerInfoServiceImpl extends BasicServiceImpl<CustomerInfoMapper, CustomerInfo> implements ICustomerInfoService {
 	@Autowired
-	private ICustomerLabelService customerLabelService;
+	private ICustomerHabbitService customerHabbitService;
 	
 	@Autowired
 	private IClockinLabelService clockinLabelService;
@@ -92,16 +92,18 @@ public class CustomerInfoServiceImpl extends BasicServiceImpl<CustomerInfoMapper
 		CustomerInfo customerInfo = this.getById(custId);
 		customerInfoVo.setCustomerInfo(customerInfo);
 		
-		//客户拥有的标签信息
-		List<CustomerLabel> listCustomerLabel = this.customerLabelService.getListCustomerLabel(custId);
+		//客户拥有的习惯信息
+		List<CustomerHabbit> listCustomerHabbit = this.customerHabbitService.getListCustomerHabbit(custId);
 		List<Integer> listLabelId = new ArrayList<Integer>();
-		if(CollectionUtils.isNotEmpty(listCustomerLabel)) {
-			listCustomerLabel.forEach(customerLabel->{
-				listLabelId.add(customerLabel.getClockinLabelId());
+		if(CollectionUtils.isNotEmpty(listCustomerHabbit)) {
+			listCustomerHabbit.forEach(customerHabbit->{
+				listLabelId.add(customerHabbit.getClockinLabelId());
 			});
 		}
-		List<ClockinLabel> listClockinLabel = this.clockinLabelService.getListClockinLabelByListId(listLabelId);
-		customerInfoVo.setListClockinLabel(listClockinLabel);
+		if(CollectionUtils.isNotEmpty(listLabelId)) {
+			List<ClockinLabel> listClockinLabel = this.clockinLabelService.getListClockinLabelByListId(listLabelId);
+			customerInfoVo.setListClockinLabel(listClockinLabel);
+		}
 		
 		//获取统计信息
 		CustomerStatisticsVo statisticsVo = new CustomerStatisticsVo();

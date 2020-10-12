@@ -1,7 +1,7 @@
 package com.farst.clockin.mapper;
 
-import com.farst.clockin.entity.ClockinSetting;
 import com.farst.common.mybatis.mapper.BasicMapper;
+import com.farst.customer.entity.CustomerHabbitSetting;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.farst.common.mybatis.mapper.BasicMapper;
  * @author MichaelWoo
  * @since 2020-09-07
  */
-public interface ClockinSettingMapper extends BasicMapper<ClockinSetting> {
+public interface ClockinSettingMapper extends BasicMapper<CustomerHabbitSetting> {
 
 }

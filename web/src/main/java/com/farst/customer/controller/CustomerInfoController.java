@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.customer.service.ICustomerLabelService;
+import com.farst.customer.service.ICustomerHabbitService;
 import com.farst.customer.vo.CustomerInfoVo;
 import com.farst.customer.vo.PhoneLoginVo;
 import com.farst.customer.vo.TokenCustVo;
@@ -12,8 +12,7 @@ import com.farst.customer.vo.TokenInfoVo;
 import com.farst.customer.dto.CustomerInfoDto;
 import com.farst.customer.entity.CustomerInfo;
 import com.farst.common.web.response.RestResponse;
-
-import io.jsonwebtoken.Claims;
+ 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation; 
 
@@ -24,11 +23,9 @@ import javax.servlet.http.HttpServletRequest;
  
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
+ 
 import com.alibaba.fastjson.JSONObject; 
-import com.farst.common.cache.redis.RedisUtils;
-import com.farst.common.exception.ServiceException; 
+import com.farst.common.cache.redis.RedisUtils; 
 import com.farst.common.utils.JwtUtils; 
 import com.farst.common.utils.StringUtils; 
 import com.farst.common.web.controller.BasicController;
@@ -52,7 +49,7 @@ public class CustomerInfoController extends BasicController {
     private ICustomerInfoService customerInfoService;
     
     @Autowired
-    private ICustomerLabelService customerLabelService;
+    private ICustomerHabbitService customerHabbitService;
  	
     @Resource
     private RedisUtils redisUtils;
@@ -90,7 +87,7 @@ public class CustomerInfoController extends BasicController {
 		TokenInfoVo tokenInfoVo = new TokenInfoVo();
 		boolean hasNickName = false;
 		boolean hasSex = false;
-		boolean hasLabel = false;
+		boolean hasHabbit = false;
 		try {
 			String _verifyCode = (String) redisUtils.get(KEY_PREFIX_FARST_SMS_VERIFY_CODE+phoneNumber); 
 			
@@ -104,7 +101,7 @@ public class CustomerInfoController extends BasicController {
 					
 					hasNickName = (customerInfo.getNickName() != null) ? true :false;
 					hasSex = (customerInfo.getSex() != null) ? true : false;
-					hasLabel = this.customerLabelService.hasCustomerLabel(customerInfo.getId());
+					hasHabbit = this.customerHabbitService.hasCustomerHabbit(customerInfo.getId());
 					
 				}else {
 					customerInfo = new CustomerInfo(); 
@@ -134,7 +131,7 @@ public class CustomerInfoController extends BasicController {
 				
 				//返回对象
 				PhoneLoginVo phoneLoginVo = new PhoneLoginVo();
-				phoneLoginVo.setHasLabel(hasLabel);
+				phoneLoginVo.setHasHabbit(hasHabbit);
 				phoneLoginVo.setHasNickName(hasNickName);
 				phoneLoginVo.setHasSex(hasSex);
 				phoneLoginVo.setTokenInfoVo(tokenInfoVo);
@@ -160,7 +157,7 @@ public class CustomerInfoController extends BasicController {
 		TokenInfoVo tokenInfoVo = new TokenInfoVo();
 		boolean hasNickName = false;
 		boolean hasSex = false;
-		boolean hasLabel = false;
+		boolean hasHabbit = false;
 		try {
 
     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
@@ -168,7 +165,7 @@ public class CustomerInfoController extends BasicController {
 					
 			hasNickName = (customerInfo.getNickName() != null) ? true :false;
 			hasSex = (customerInfo.getSex() != null) ? true : false;
-			hasLabel = this.customerLabelService.hasCustomerLabel(customerInfo.getId());
+			hasHabbit = this.customerHabbitService.hasCustomerHabbit(customerInfo.getId());
 			 
 			TokenCustVo tokenCustVo = new TokenCustVo();
 			tokenCustVo.setCustId(custId); 
@@ -184,7 +181,7 @@ public class CustomerInfoController extends BasicController {
 			
 			//返回对象
 			PhoneLoginVo phoneLoginVo = new PhoneLoginVo();
-			phoneLoginVo.setHasLabel(hasLabel);
+			phoneLoginVo.setHasHabbit(hasHabbit);
 			phoneLoginVo.setHasNickName(hasNickName);
 			phoneLoginVo.setHasSex(hasSex);
 			phoneLoginVo.setTokenInfoVo(tokenInfoVo);

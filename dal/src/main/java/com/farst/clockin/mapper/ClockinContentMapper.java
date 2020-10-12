@@ -28,12 +28,12 @@ public interface ClockinContentMapper extends BasicMapper<ClockinContent> {
 	
 	void updateContent(@Param("id") Integer id,@Param("content") String content);
 	
-	ClockinContent selectTodayClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("clockinLabelId") Integer clockinLabelId);
+	ClockinContent selectTodayClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("customerHabbitId") Integer customerHabbitId);
 	
-	List<ClockinContent> selectCurMonthListClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("clockinLabelId") Integer clockinLabelId);
+	List<ClockinContent> selectCurMonthListClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("customerHabbitId") Integer customerHabbitId);
 	
-	List<ClockinContent> selectMonthListClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("clockinLabelId") Integer clockinLabelId,@Param("month") String month);
+	List<ClockinContent> selectMonthListClockinContent(@Param("customerInfoId") Integer customerInfoId,@Param("customerHabbitId") Integer customerHabbitId,@Param("month") String month);
 	
-	List<ClockinTrendStatisticsVo> selectListClockinTrendStatisticsVo(@Param("customerInfoId") Integer customerInfoId,@Param("customerLabelId") Integer customerLabelId,@Param("clockinLabelId") Integer clockinLabelId,@Param("type") Integer type);
+	List<ClockinTrendStatisticsVo> selectListClockinTrendStatisticsVo(@Param("customerInfoId") Integer customerInfoId,@Param("customerHabbitId") Integer customerHabbitId,@Param("type") Integer type);
 	
 }

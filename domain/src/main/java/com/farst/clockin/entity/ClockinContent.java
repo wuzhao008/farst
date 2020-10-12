@@ -25,8 +25,8 @@ public class ClockinContent extends BasicEntity {
     @ApiModelProperty(value = "用户ID")
     private Integer customerInfoId;
 
-    @ApiModelProperty(value = "标签ID")
-    private Integer clockinLabelId;
+    @ApiModelProperty(value = "习惯ID")
+    private Integer customerHabbitId;
 
     @ApiModelProperty(value = "是否公开")
     private Integer isPublic;

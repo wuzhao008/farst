@@ -18,8 +18,8 @@ public class PhoneLoginVo implements Serializable{
 	@ApiModelProperty(value = "是否选择性别", required = true)
 	private boolean hasSex;
 
-	@ApiModelProperty(value = "是否设置标签", required = true)
-	private boolean hasLabel;
+	@ApiModelProperty(value = "是否设置习惯", required = true)
+	private boolean hasHabbit;
 	
 	@ApiModelProperty(value = "token信息", required = true)
 	private TokenInfoVo tokenInfoVo;

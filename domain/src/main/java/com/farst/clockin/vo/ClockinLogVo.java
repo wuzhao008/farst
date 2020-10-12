@@ -1,7 +1,8 @@
 package com.farst.clockin.vo;
 
 import java.io.Serializable; 
-import com.farst.clockin.entity.ClockinLabel; 
+import com.farst.clockin.entity.ClockinLabel;
+import com.farst.customer.entity.CustomerHabbit;
 import com.farst.customer.entity.CustomerInfo;
 
 import io.swagger.annotations.ApiModel;
@@ -18,6 +19,9 @@ public class ClockinLogVo implements Serializable{
 	private CustomerInfo customerInfo;
 	
 	@ApiModelProperty(value = "习惯信息", required = true)
+	private CustomerHabbit customerHabbit;
+	
+	@ApiModelProperty(value = "标签信息", required = true)
 	private ClockinLabel clockinLabel;
 	
 	@ApiModelProperty(value = "打卡内容Vo", required = true)
