@@ -22,3 +22,14 @@ spring:
       max-idle: 8
       max-wait: -1
     password: uupredisserver123!@#
+    
+  ftp:
+    address: 39.108.165.241
+    port: 21
+    username: ftp
+    password: uupftp2018
+    retry: 10
+    timeout: 5000
+    workingDirectory: /farst
+    tempFilePath: /Users/wuzhao/Downloads/temp 
+    
