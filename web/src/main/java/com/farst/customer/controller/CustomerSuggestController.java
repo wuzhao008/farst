@@ -4,7 +4,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.farst.customer.service.ICustomerInfoService;
-import com.farst.customer.service.ICustomerSuggestService; 
+import com.farst.customer.service.ICustomerMessageService;
+import com.farst.customer.service.ICustomerSuggestService;
+import com.farst.customer.entity.CustomerMessage;
 import com.farst.customer.entity.CustomerSuggest;
 import com.farst.common.web.response.RestResponse;
 import io.swagger.annotations.Api;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.farst.common.utils.StringUtils;
 import com.farst.common.web.controller.BasicController;
  
 /**
@@ -37,6 +40,8 @@ public class CustomerSuggestController extends BasicController {
     private ICustomerSuggestService customerSuggestService;
     @Autowired
     private ICustomerInfoService customerInfoService;
+    @Autowired
+    private ICustomerMessageService customerMessageService;
  	 
  
     /**
@@ -111,5 +116,50 @@ public class CustomerSuggestController extends BasicController {
     	return response;
     }
   
- 
+
+    /**
+     * 回复建议
+     */
+    @ApiOperation(value = "回复建议-【由于无后台系统，暂时作为建议回复功能】")
+    @PostMapping(value = "/replySuggest")
+    public RestResponse<String> replySuggest(@RequestParam("suggestId") Integer suggestId,@RequestBody String content){
+    	 RestResponse<String> response = new RestResponse<>();
+         try {
+        	CustomerSuggest cs = this.customerSuggestService.getById(suggestId);
+        	if(cs == null || cs.getStatus().intValue() != 0) {
+        		response.setErrorMsg("非法请求");
+        		return response;
+        	}
+        	if(StringUtils.isEmpty(content)) {
+        		response.setErrorMsg("回复内容不能为空");
+        		return response;
+        	}
+        	cs.setReply(content);
+        	cs.setOperStatus(1);
+        	cs.setReplyDate(new Date());
+        	this.customerSuggestService.saveOrUpdate(cs);
+        	
+
+        	CustomerMessage cm = new CustomerMessage();
+        	cm.setContent(content);
+        	cm.setCreateDate(new Date());
+        	//以惯性管理员的身份，固定为0的用户ID
+        	cm.setCustomerInfoId(0);
+        	cm.setMessageType(1);
+        	cm.setObjectContent(cs.getContent());
+        	cm.setObjectId(cs.getId());
+        	cm.setReadStatus(0);
+        	cm.setStatus(0);
+        	this.customerMessageService.save(cm);
+        	
+            response.setSuccess("回复建议成功");
+         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+         }
+         return response;
+    }
+    
+    
 }

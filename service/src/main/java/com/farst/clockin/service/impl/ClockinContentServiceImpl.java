@@ -11,6 +11,8 @@ import com.farst.clockin.vo.ClockinContentVo;
 import com.farst.clockin.vo.ClockinTrendStatisticsVo;
 import com.farst.clockin.vo.TodayClockinVo;
 import com.farst.common.service.impl.BasicServiceImpl;
+import com.farst.customer.entity.CustomerMessage;
+import com.farst.customer.service.ICustomerMessageService;
 
 import java.util.Date;
 import java.util.List;
@@ -35,6 +37,9 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	
 	@Autowired
 	private IClockinPictureService clockinPictureService;
+	
+	@Autowired
+	private ICustomerMessageService customerMessageService;
 	
 	@Override
 	public IPage<TodayClockinVo> getPageTodayClockinVo(IPage<TodayClockinVo> page, Integer customerInfoId) {
@@ -108,7 +113,7 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 			cc.setCustomerInfoId(customerInfoId);
 			cc.setCustomerHabbitId(habbitId);
 			cc.setCreateDate(new Date());
-			cc.setCheckStatus(0);
+			cc.setCheckStatus(1);
 			cc.setStatus(0);
 			this.save(cc);
 		}
@@ -130,6 +135,8 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 		ClockinContent cc = this.getTodayClockinContent(customerInfoId, habbitId);
 		if(cc != null) {
 			cc.setContent(content);
+			//编辑后默认置为审核通过
+			cc.setCheckStatus(1);
 			cc.setIsPublic(isPublic);
 			cc.setLastEditTime(new Date());
 			this.saveOrUpdate(cc);
@@ -160,6 +167,43 @@ public class ClockinContentServiceImpl extends BasicServiceImpl<ClockinContentMa
 	@Override
 	public void updateContent(Integer id, String content) {
 		this.clockinContentMapper.updateContent(id, content);
+	}
+
+	@Override
+	public void checkRejectClockinContent(Integer contentId) {
+		
+		//将内容干掉 
+		ClockinContent cc = this.getById(contentId);
+		String content = cc.getContent();
+		if(cc!=null) {
+			cc.setCheckStatus(2);
+			cc.setContent(null);
+			cc.setLastEditTime(new Date());
+			this.saveOrUpdate(cc);
+			
+			//图片干掉
+			List<ClockinPicture> listCp = clockinPictureService.getAllClockinPictureByContentId(contentId);
+			if(CollectionUtils.isNotEmpty(listCp)) {
+				for(ClockinPicture cp : listCp) {
+					cp.setStatus(1);
+					cp.setLastEditTime(new Date());
+				}
+				this.clockinPictureService.saveOrUpdateBatch(listCp);
+			}
+			
+			//发送消息
+	    	CustomerMessage cm = new CustomerMessage();
+	    	cm.setContent("您的日志存在违规内容，已被系统删除");
+	    	cm.setCreateDate(new Date());
+	    	cm.setCustomerInfoId(cc.getCustomerInfoId());
+	    	cm.setSourceCustomerInfoId(0);
+	    	cm.setMessageType(5);
+	    	cm.setObjectContent(content);
+	    	cm.setObjectId(cc.getId());
+	    	cm.setReadStatus(0);
+	    	cm.setStatus(0);
+	    	this.customerMessageService.save(cm);
+		}
 	}
 		
 }

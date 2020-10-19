@@ -12,7 +12,9 @@ import com.farst.clockin.entity.ClockinContent;
 import com.farst.clockin.entity.ClockinReview;
 import com.farst.common.web.response.RestResponse;
 import com.farst.customer.entity.CustomerInfo;
+import com.farst.customer.entity.CustomerMessage;
 import com.farst.customer.service.ICustomerInfoService;
+import com.farst.customer.service.ICustomerMessageService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.farst.common.utils.StringUtils;
 import com.farst.common.web.controller.BasicController;
  
 /**
@@ -55,6 +58,9 @@ public class ClockinReviewController extends BasicController {
     
     @Autowired
     private ICustomerInfoService customerInfoService;
+    
+    @Autowired
+    private ICustomerMessageService customerMessageService;
     
     /**
      * 查询日志内容对应的分页评论信息
@@ -145,7 +151,7 @@ public class ClockinReviewController extends BasicController {
     	try {
         	Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
         	ClockinContent cc = this.clockinContentService.getById(clockinReviewDto.getClockinContentId());
-        	if(cc == null || cc.getStatus() != 0) {
+        	if(cc == null || cc.getStatus() != 0 || StringUtils.isEmpty(cc.getContent())) {
         		response.setErrorMsg("非法日志内容");
         		return response;
         	}
@@ -154,9 +160,22 @@ public class ClockinReviewController extends BasicController {
         	cr.setClockinContentId(clockinReviewDto.getClockinContentId());
         	cr.setContent(clockinReviewDto.getReviewContent());
         	cr.setStatus(0);
+        	cr.setCheckStatus(1);
         	cr.setCustomerInfoId(custId);
         	cr.setCreateDate(new Date());
         	this.clockinReviewService.save(cr);
+        	
+        	CustomerMessage cm = new CustomerMessage();
+        	cm.setContent(cr.getContent());
+        	cm.setCreateDate(new Date());
+        	cm.setCustomerInfoId(custId);
+        	cm.setMessageType(2);
+        	cm.setObjectContent(cc.getContent());
+        	cm.setObjectId(cr.getId());
+        	cm.setReadStatus(0);
+        	cm.setStatus(0);
+        	this.customerMessageService.save(cm);
+        	
      		response.setSuccess("评论成功");
     	}catch (Exception e) {
             e.printStackTrace();
@@ -165,6 +184,32 @@ public class ClockinReviewController extends BasicController {
         }
     	return response;
     }
+    
+
+    @ApiOperation(value = "审核拒绝日志评论-【暂替换后台审核功能做的接口】")
+    @PostMapping(value = "/checkRejectReview")
+    public RestResponse<String> checkRejectClockinContent(@RequestHeader("tokenid") String tokenid,@RequestParam("reviewIds") String reviewIds){
+    	RestResponse<String> response = new RestResponse<String>();
+    	try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		if(custId != 0) {
+     			response.setErrorMsg("系统管理员才能操作该功能接口");
+     			return response;
+     		}
+     		String[] arrStrReviewId = reviewIds.split(",");
+     		for(int i=0;i<arrStrReviewId.length;i++) {
+     			Integer reviewId = Integer.valueOf(arrStrReviewId[i]);
+     			this.clockinReviewService.checkRejectClockinReview(reviewId);
+     		}
+     		response.setSuccess("操作成功");
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    }
+    
     
     @ApiOperation(value = "删除某条我的评论")
     @PostMapping(value = "/removeReview")

@@ -25,7 +25,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Arrays; 
 import java.util.List;
 import java.util.Map;
 
@@ -177,6 +177,31 @@ public class ClockinContentController extends BasicController {
     }
     
 
+    @ApiOperation(value = "审核拒绝打卡日志-【暂替换后台审核功能做的接口】")
+    @PostMapping(value = "/checkRejectClockinContent")
+    public RestResponse<String> checkRejectClockinContent(@RequestHeader("tokenid") String tokenid,@RequestParam("contentIds") String contentIds){
+    	RestResponse<String> response = new RestResponse<String>();
+    	try {
+     		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
+     		if(custId != 0) {
+     			response.setErrorMsg("系统管理员才能操作该功能接口");
+     			return response;
+     		}
+     		String[] arrStrContentId = contentIds.split(",");
+     		for(int i=0;i<arrStrContentId.length;i++) {
+     			Integer contentId = Integer.valueOf(arrStrContentId[i]);
+     			this.clockinContentService.checkRejectClockinContent(contentId);
+     		}
+     		response.setSuccess("操作成功");
+    	}catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            response.setErrorMsg(e.getMessage());
+        }
+    	return response;
+    }
+    
+    
 
     @ApiOperation(value = "删除掉我的某条打卡日志")
     @PostMapping(value = "/removeClockinContent")
@@ -200,7 +225,7 @@ public class ClockinContentController extends BasicController {
     }
     
     /**
-     * 查询同道中人的日志信息
+     * 查询同道中人的日志信息a
      */
     @ApiOperation(value = "查询同道中人的日志信息")
     @GetMapping(value = "/getPageSimilarClockinLog")

@@ -129,7 +129,7 @@
 		 where a.`customer_info_id` = #{customerInfoId}
 		   and a.`status` = 0
 		   and a.`is_public` in(0,1)
-		   and a.`check_status` = 1
+		   and a.`check_status` in(0,1)
 		   and a.`content` is not null
 		order by a.`create_date` desc 
     </select>

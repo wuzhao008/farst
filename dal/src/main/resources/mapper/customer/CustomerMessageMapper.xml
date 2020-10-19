@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.farst.customer.entity.CustomerMessage">
         <result column="id" property="id" />
         <result column="customer_info_id" property="customerInfoId" />
+        <result column="source_customer_info_id" property="sourceCustomerInfoId" />
         <result column="message_type" property="messageType" />
         <result column="content" property="content" />
         <result column="object_id" property="objectId" />
@@ -19,7 +20,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        customer_info_id, message_type, content, object_id, object_content, read_status,status, create_date, last_edit_time
+        customer_info_id,source_customer_info_id, message_type, content, object_id, object_content, read_status,status, create_date, last_edit_time
     </sql>
 
 </mapper>

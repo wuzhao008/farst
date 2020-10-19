@@ -133,5 +133,12 @@ public interface IClockinContentService extends IBasicService<ClockinContent> {
 	 */
 	public void updateContent(Integer id,String content);
 	
+	/**
+	 * 审核拒绝打卡日志
+	 * 
+	 * @param contentId
+	 */
+	public void checkRejectClockinContent(Integer contentId);
+	
 	
 }

@@ -5,18 +5,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.farst.customer.service.ICustomerInfoService;
 import com.farst.customer.service.ICustomerMessageService;
+import com.farst.customer.vo.CustomerMessageVo; 
+import com.farst.customer.entity.CustomerInfo;
 import com.farst.customer.entity.CustomerMessage;
 import com.farst.common.web.response.RestResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
- 
-import java.util.Date; 
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List; 
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.farst.common.web.controller.BasicController;
- 
+
 /**
  * <p>
     * 用户消息 前端控制器
@@ -42,13 +48,46 @@ public class CustomerMessageController extends BasicController {
      */
     @ApiOperation(value = "查询分页数据")
     @GetMapping(value = "/pageMyMessage")
-    public RestResponse<IPage<CustomerMessage>> pageMyMessage(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,@RequestParam(name = "pageSize", defaultValue = "20") int pageSize){
-        RestResponse<IPage<CustomerMessage>> response = new RestResponse<>();
-    	IPage<CustomerMessage> page = new Page<CustomerMessage>(pageNum, pageSize); 
+    public RestResponse<IPage<CustomerMessageVo>> pageMyMessage(@RequestHeader("tokenid") String tokenid,@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,@RequestParam(name = "pageSize", defaultValue = "20") int pageSize){
+        RestResponse<IPage<CustomerMessageVo>> response = new RestResponse<>();
+    	IPage<CustomerMessage> pageCm = new Page<CustomerMessage>(pageNum, pageSize); 
+    	IPage<CustomerMessageVo> pageCmVo = new Page<CustomerMessageVo>(pageNum, pageSize);
+    	
     	try {
      		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-	    	page = this.customerMessageService.getPageMyMessage(page, custId);
-	    	response.setSuccess(page);
+     		pageCm = this.customerMessageService.getPageMyMessage(pageCm, custId);
+     		pageCmVo.setPages(pageCm.getPages());
+     		pageCmVo.setTotal(pageCm.getTotal());
+	    	
+	    	List<CustomerMessage> listCm = pageCm.getRecords();
+	    	List<CustomerMessageVo> listCmVo = new ArrayList<CustomerMessageVo>();
+      		List<Integer> listCustId = new ArrayList<Integer>();
+      		List<CustomerInfo> listCust = null;
+
+      		if(CollectionUtils.isNotEmpty(listCm)) {
+      			listCm.forEach(cm->{ 
+      				listCustId.add(cm.getSourceCustomerInfoId()); 
+      			});
+          		listCust = this.customerInfoService.getListCustomerInfoBy(listCustId);
+      			
+          		for(CustomerMessage cm : listCm) {
+      				CustomerMessageVo cmVo = new CustomerMessageVo();
+      				cmVo.setCustomerMessage(cm);
+      				
+      				//构造用户信息
+      				if(CollectionUtils.isNotEmpty(listCust)) {
+      					for(CustomerInfo cust : listCust) {
+      						if(cust.getId().equals(cm.getSourceCustomerInfoId())) {
+      							cmVo.setSourceCustomerInfo(cust);
+      							break;
+      						}
+      					}
+      				}
+      				listCmVo.add(cmVo);
+      			}
+      		}
+      		pageCmVo.setRecords(listCmVo);
+      		response.setSuccess(pageCmVo); 
     	}catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -77,6 +116,48 @@ public class CustomerMessageController extends BasicController {
     }
   
 
+    @ApiOperation(value = "发送系统消息-【暂时替代后台系统发送】")
+    @PostMapping(value = "/sendSysMessage")
+    public RestResponse<String> sendSysMessage(@RequestHeader("tokenid") String tokenid,@RequestBody String content){
+    	RestResponse<String> response = new RestResponse<>();
+    	try {
+    		Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId(); 
+    		if(custId != 0) {
+    			response.setErrorMsg("非法请求，必须系统管理员才能操作");
+    			return response;
+    		}
+    		IPage<CustomerInfo> pageCi = new Page<CustomerInfo>(1, 1);
+    		pageCi = this.customerInfoService.page(pageCi);
+    		long total = pageCi.getTotal();
+    		
+    		for(long i =1; (i-1) * 100 < total ;i++ ) {
+    			pageCi = new Page<CustomerInfo>(i, 100);
+    			pageCi = this.customerInfoService.page(pageCi);
+    			List<CustomerInfo> listCi = pageCi.getRecords();
+    			List<CustomerMessage> listCm = new ArrayList<CustomerMessage>();
+    			if(CollectionUtils.isNotEmpty(listCi)) {
+    				for(CustomerInfo ci: listCi) {
+    					CustomerMessage cm = new CustomerMessage();
+    					cm.setContent(content);
+    					cm.setCreateDate(new Date());
+    					cm.setCustomerInfoId(ci.getId());
+    					cm.setMessageType(0);
+    					cm.setReadStatus(0);
+    					cm.setStatus(0);
+    					cm.setSourceCustomerInfoId(custId);
+    					listCm.add(cm);
+    				}
+    			}
+    			this.customerMessageService.saveBatch(listCm);
+    		}
+    		
+    		response.setSuccess("系统消息发送成功");
+    	}catch(Exception e) {
+    		response.setErrorMsg(e.getMessage());
+    	}
+    	return response;
+    }
+    
     @ApiOperation(value = "删除消息")
     @PostMapping(value = "/deleteMessage")
     public RestResponse<String> updateAllMessage2ReadStatus(@RequestHeader("tokenid") String tokenid,@RequestParam("messageId") Integer messageId){

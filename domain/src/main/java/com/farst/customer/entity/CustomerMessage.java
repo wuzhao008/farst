@@ -20,15 +20,18 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value="CustomerMessage对象", description="用户消息")
 public class CustomerMessage extends BasicEntity {
-
+	
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "用户ID")
     private Integer customerInfoId;
 
-    @ApiModelProperty(value = "消息类型（0系统发布、1建议回复、2日志评论 3点赞日志 4点赞评论 9其他)")
-    private Integer messageType;
+    @ApiModelProperty(value = "来源用户ID")
+    private Integer sourceCustomerInfoId; 
 
+    @ApiModelProperty(value = "消息类型（0系统发布-暂时不处理、1建议回复、2日志评论 3点赞日志 4点赞评论 9其他)")
+    private Integer messageType;
+    
     @ApiModelProperty(value = "消息内容")
     private String content;
 

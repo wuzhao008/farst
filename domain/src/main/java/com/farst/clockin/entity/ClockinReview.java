@@ -29,7 +29,10 @@ public class ClockinReview extends BasicEntity {
 
     @ApiModelProperty(value = "评论内容")
     private String content;
-
+    
+    @ApiModelProperty(value = "审核状态(0未审核,1为审核通过,2为审核失败)")
+    private Integer checkStatus;
+    
     @ApiModelProperty(value = "正常删除状态(0正常,1为删除)")
     private Integer status;
 

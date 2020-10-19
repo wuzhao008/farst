@@ -41,4 +41,11 @@ public interface IClockinReviewService extends IBasicService<ClockinReview> {
 	 */
 	public Long getReviewCountByContentId(Integer clockinContentId);
 	
+	/**
+	 * 审核拒绝日志评论
+	 * 
+	 * @param reviewId
+	 */
+	public void checkRejectClockinReview(Integer reviewId);
+	
 }

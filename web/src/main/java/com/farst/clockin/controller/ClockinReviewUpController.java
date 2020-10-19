@@ -8,7 +8,9 @@ import com.farst.clockin.service.IClockinReviewUpService;
 import com.farst.clockin.entity.ClockinReview;
 import com.farst.clockin.entity.ClockinReviewUp; 
 import com.farst.common.web.response.RestResponse;
+import com.farst.customer.entity.CustomerMessage;
 import com.farst.customer.service.ICustomerInfoService;
+import com.farst.customer.service.ICustomerMessageService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +44,9 @@ public class ClockinReviewUpController extends BasicController {
     
     @Autowired
     private IClockinReviewUpService clockinReviewUpService;
+    
+    @Autowired
+    private ICustomerMessageService customerMessageService;
  	
     @ApiOperation(value = "点赞评论")
     @PostMapping(value = "/upReview")
@@ -49,23 +54,35 @@ public class ClockinReviewUpController extends BasicController {
     	RestResponse<String> response = new RestResponse<String>();
     	try {
         	Integer custId = this.customerInfoService.getTokenCustVo(tokenid).getCustId();
-        	ClockinReview cc = this.clockinReviewService.getById(clockinReviewId);
-        	if(cc == null || cc.getStatus() != 0) {
+        	ClockinReview cr = this.clockinReviewService.getById(clockinReviewId);
+        	if(cr == null || cr.getStatus() != 0) {
         		response.setErrorMsg("非法请求");
         		return response;
         	}
-        	ClockinReviewUp ccup = this.clockinReviewUpService.getClockinReviewRecord(custId, clockinReviewId);
-        	if(ccup == null) {
-        		ccup = new ClockinReviewUp();
-        		ccup.setClockinReviewId(clockinReviewId);
-        		ccup.setCustomerInfoId(custId);
-        		ccup.setStatus(0);
-        		ccup.setCreateDate(new Date());
+        	ClockinReviewUp crup = this.clockinReviewUpService.getClockinReviewRecord(custId, clockinReviewId);
+        	if(crup == null) {
+        		crup = new ClockinReviewUp();
+        		crup.setClockinReviewId(clockinReviewId);
+        		crup.setCustomerInfoId(custId);
+        		crup.setStatus(0);
+        		crup.setCreateDate(new Date());
         	}else {
-        		ccup.setStatus(0);
-        		ccup.setLastEditTime(new Date());
+        		crup.setStatus(0);
+        		crup.setLastEditTime(new Date());
         	}
-        	this.clockinReviewUpService.saveOrUpdate(ccup);
+        	this.clockinReviewUpService.saveOrUpdate(crup);
+        	
+        	CustomerMessage cm = new CustomerMessage();
+        	cm.setContent("点赞了您的评论");
+        	cm.setCreateDate(new Date());
+        	cm.setCustomerInfoId(custId);
+        	cm.setMessageType(4);
+        	cm.setObjectContent(cr.getContent());
+        	cm.setObjectId(crup.getId());
+        	cm.setReadStatus(0);
+        	cm.setStatus(0);
+        	this.customerMessageService.save(cm);
+        	
      		response.setSuccess("点赞成功");
     	}catch (Exception e) {
             e.printStackTrace();
